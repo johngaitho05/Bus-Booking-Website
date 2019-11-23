@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+
+    <title>Guardian Coach</title>
+    <!--
+    Hydro Template
+    http://www.templatemo.com/tm-509-hydro
+    -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href=" {% static 'css/bootstrap.css'%} " />
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+</head>
+<body>
+
+<!-- PRE LOADER -->
+<section class="preloader">
+    <div class="spinner">
+        <span class="spinner-rotate"></span>
+    </div>
+</section>
+
+
+<!-- MENU -->
+<section class="navbar custom-navbar navbar-fixed-top">
+    <div class="container">
+
+        <div class="navbar-header">
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon icon-bar"></span>
+                <span class="icon icon-bar"></span>
+                <span class="icon icon-bar"></span>
+            </button>
+
+            <!-- lOGO TEXT HERE -->
+            <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
+        </div>
+
+        <!-- MENU LINKS -->
+        <div class="collapse navbar-collapse text-center">
+
+            <ul class="nav navbar-nav navbar-right ">
+                <li class="active"><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="#destinations" class="scroll">Destinations</a></li>
+                <li><a href="{% url 'booking' %}" >Booking</a></li>
+                <li><a href="#services" class="scroll">Services</a></li>
+                <li><a href="#contact" class="scroll">Contact</a></li>
+                <li><a href="#" class="scroll">About us</a></li>
+               {% if user.is_authenticated %}
+                    <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>
+                {% else %}
+                    <li><a href="#" id="btnLoginModal" style="padding-left: 50px">Login</a></li>
+                    <li><a href="{%  url 'signup' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+
+    </div>
+</section>
+<div id="mySidenav" class="sidenav" data-backdrop=''>
+    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>
+    <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>
+    <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>
+    <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
+    <form id="logout_form" method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="hidden"/>
+    </form>
+</div>
+
+<!-- HOME -->
+<section id="home" data-stellar-background-ratio="0.5" onclick='closeNav()'>
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            {% block pagecontent %}
+            {% endblock %}
+
+        </div>
+    </div>
+</section>
+
+
+<!-- DESTINATIONS -->
+<section id="destinations" data-stellar-background-ratio="0.5">
+    <div class="container">
+        <div class="row" id="destinations">
+
+            <div class="col-md-12 col-sm-12">
+                <div class="section-title">
+                    <h2>Destinations</h2>
+
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 ">
+                <!-- BLOG THUMB -->
+                <ul>
+                    <li>Nairobi </li>
+                    <li>Nakuru </li>
+                    <li>Eldoret </li>
+                    <li>machakos </li>
+                </ul>
+            </div>
+
+            <div class="col-md-4 col-sm-6 ">
+                <!-- BLOG THUMB -->
+                <ul>
+                    <li>nyamira<br /></li>
+                    <li>Busia <br /></li>
+                    <li>Kitale <br /></li>
+                </ul>
+            </div>
+            <div class="col-md-4 col-sm-12" style="margin-top: 50px;">
+                <h3 style="font-family: 'Rokkitt', serif;color:#101010">Coming soon in other areas</h3>
+            </div>
+            <div class="col-md-12">
+                <div id="stresspoint">
+                    <p><span>Note: </span>Terminal charges applies to all alighting points</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- SERVICES -->
+<section id="services" data-stellar-background-ratio="0.5">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-12 col-sm-12">
+                <div class="section-title">
+                    <h2>Our services</h2>
+                    <span class="line-bar">...</span>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+                <!-- BLOG THUMB -->
+                <div class="media blog-thumb">
+                    <div class="media-object media-left">
+                        <a href="#"><img src="{% static 'images/bus.jpg' %}" class="img-responsive" alt="" height="100"></a>
+                    </div>
+                    <div class="media-body blog-info">
+                        <h3><a href="#">Reservation</a></h3>
+                        <p>You can have your seat(s) reserved  by sending your payment via mpesa </p>
+                        <a href="#" class="btn section-btn">Grab your seat</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6">
+                <!-- BLOG THUMB -->
+                <div class="media blog-thumb">
+                    <div class="media-object media-left">
+                        <a href="#"><img src="{% static 'images/bus2.jpg' %}" class="img-responsive" alt=""></a>
+                    </div>
+                    <div class="media-body blog-info">
+                        <h3><a href="#">Renting</a></h3>
+                        <p>We lease buses at affordable prices and they comes with a driver </p>
+                        <a href="#" class="btn section-btn">Book a bus</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" data-stellar-background-ratio="0.5">
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-12 col-sm-12">
+                <div class="section-title">
+                    <h2>Contact us</h2>
+                    <span class="line-bar">...</span>
+                </div>
+            </div>
+
+            <div class="col-md-8 col-sm-8">
+
+                <!-- CONTACT FORM HERE -->
+                <form id="contact-form" role="form" action="#" method="post">
+                    {% csrf_token %}
+                    <div class="col-md-6 col-sm-12">
+                        <input type="text" class="form-control" placeholder="Full Name" id="full_name" name="full_name" required="">
+                    </div>
+
+                    <div class="col-md-6 col-sm-12">
+                        <input type="email" class="form-control" placeholder="Your Email" id="email" name="email" required="">
+                    </div>
+
+                    <div class="col-xs-12">
+                        <input type="tel" class="form-control" placeholder="Subject" id="cf-number" name="ms-subject" required="">
+                    </div>
+                    <div class="col-md-12 col-sm-12">
+                        <textarea class="form-control" rows="6" placeholder="Message" id="message" name="cf-message" required=""></textarea>
+                    </div>
+
+                    <div class="col-md-4 col-sm-12 col-md-offset-4">
+                        <input type="submit" class="btn btn-success btn-lg" name="submit" value="Send Message">
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="col-md-4 col-sm-12">
+                <div class="google-map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8173395291315!2d36.821373314941!3d-1.2834620359855553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d6678064cf%3A0x956bb6f5e0ab2aac!2sMoi%20Ave%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1574252718356!5m2!1sen!2ske" width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""></iframe>
+                </div>
+            </div>
+            <div class="row col-xs-12">
+                <div class="social text-center">
+                    <h4>Connect</h4>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-google-plus-g"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div>
+                    or <br />
+                    <p id="maillink">Email us: <a href="#">theguardian06@gmail.com</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container-fluid">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h3 style="color:red; font-family:'Bad Script', cursive;" >The Guardian</h3>
+                <hr class="light" />
+                <p>555-555-5555</p>
+                <p>email.eymail.com</p>
+                <p>100 Street Name</p>
+                <p>City, State, 00000</p>
+                <p></p>
+            </div>
+            <div class="col-md-4">
+                <hr class="light"/>
+                <h5>Our hours</h5>
+                <hr class="light"/>
+                <p>24 hours</p>
+                <p>seven days a week</p>
+                <p></p>
+            </div>
+            <div class="col-md-4">
+                <hr class="light"/>
+                <h5>Service Area</h5>
+                <hr class="light"/>
+                <p>City, State, 00000</p>
+                <p>City, State, 00000</p>
+                <p>City, State, 00000</p>
+                <p>City, State, 00000</p>
+            </div>
+            <div class="col-12">
+                <hr class="light-100" />
+                <h4 style="color:#FFFFCC">&copy; theguardian.co.ke</h4>
+            </div>
+
+        </div>
+    </div>
+</footer>
+
+{#---------------------#}
+{#LOGIN MODAL#}
+{#---------------------#}
+<div class="modal fade" id="loginModal" tabindex="-1" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">&times;</button>
+                <h3 class="text-center" style="color:#FFFFCC">LOGIN FORM</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                    <p style="color:red;font-size: 17px;" id="login_warning" >{{ warning }}</p>
+                    <p style="color:#4297ff;font-size: 17px;" id="login_message">{{ message }}</p>
+                        <form action="{% url 'login'  %}" id="loginForm" method="post">
+                    {% csrf_token %}
+                    <div class="form-group-lg">
+                        <label for="inputUsername">Email Address</label>
+                        <input type="text" id="inputUsername" class="form-control " name="username"/></div>
+
+                    <div class="form-group-lg">
+                        <label for="inputPassword">Password</label>
+                        <input type="password" id="inputPassword" class="form-control" name="password"/>
+                    </div>
+                            <div class="form-group-lg">
+                                <input type="hidden" value='{{ where_to }}' name="where_to"/>
+                                <input class="btn btn-default" id="login_button" type="submit" Value="LOGIN" />
+                            </div>
+                </form>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+{#                <button class="btn btn-default" data-dismiss="modal">Close</button>#}
+{#                <br/>#}
+{#                <a href="{% url 'signup' %} class=text-center">Register Now</a>#}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="{% static 'js/jquery.js' %}"></script>
+{#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
+<script src="{% static 'js/jquery.stellar.js' %}"></script>
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'js/smoothscroll.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+{#<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js"></script>#}
+
+
+<script>
+    $(document).ready(function(){
+        {% if view and view == 'login' %}
+            $('#loginModal').modal('show');
+            {% if login_warning %}
+            document.getElementById('login_warning').innerHTML = '{{ login_warning }}';
+            {% elif login_message %}
+            document.getElementById('login_message').innerHTML = '{{ login_message }}';
+                {% endif %}
+        {% endif %}
+    });
+    /* Set the width of the side navigation to 300px */
+    function openNav() {
+        document.getElementById("mySidenav").style.width = "300px";
+    }
+
+    /* Set the width of the side navigation to 0 */
+    function closeNav() {
+        document.getElementById("mySidenav").style.width = "0";
+    }
+    $('#btnLoginModal').click(function(){
+
+        $('#loginModal').modal('show');
+
+        $('#login_button').click(function(){
+            document.getElementById('loginForm').submit();
+        });
+        {% if alert_message %}
+            alert("{{ alert_message }}")
+        {% endif %}
+    });
+</script>
+</body>
+
+</html>

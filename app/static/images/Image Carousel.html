@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <link rel="stylesheet" href="css/bootstrap.css" />
+        <script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+        <script type="text/javascript" src="js/bootstrap.js"></script> 
+        <link rel="stylesheet" href="css/style.css" />
+        <style type="text/css">
+            p{
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="col-md-8 col-md-offset-2">
+<!-- the data-interval attribute is optional, if not specified the default value is applied (5000 milliseconds/ 5 secs)
+to activate carouse without writing Javascript code, on the parent div use the data-ride attribute and set it to carousel
+setting 'data-pause' attribute="false" to disable pause on hover (by default it's set to true)
+setting data-wrap attribute="false" enables the slide-show to stop at the last slide(no repeat)_(by default it's set to true)
+setting  data-interval attribute to false disables automatic flip(slide show) such that next/previous slide can only be accessed by clicking on the carousel-controls -->
+          <div id="imageCarousel" class="carousel slide" data-interval="false" data-pause="false" data-wrap="false">
+              <ol class="carousel-indicators">
+                  <li data-target="#imageCarousel" data-slide-to="0" class="active"></li>
+                  <li data-target="#imageCarousel" data-slide-to="1"></li>
+                  <li data-target="#imageCarousel" data-slide-to="2"></li>
+                  <li data-target="#imageCarousel" data-slide-to="3"></li>
+              </ol>
+            <div class="carousel-inner">
+            <div class="item active">
+                <img src="../img/mountain.png" alt="" class="img-responsive"/>
+                <div class="carousel-caption">
+                    <h3>Mountain</h3>
+                    <p>Mountain image Description</p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="../img/background2.png" alt="" class="img-responsive"/>
+                <div class="carousel-caption">
+                    <h3>Background2</h3>
+                    <p>Background2 image Description</p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="../img/background3.png" alt="" class="img-responsive"/>
+                <div class="carousel-caption">
+                    <h3>Background3</h3>
+                    <p>Background3 image Description</p>
+                </div>
+            </div>
+            <div class="item">
+                <img src="../img/nettus-1200x615.png" alt="" class="img-responsive"/>
+                <div class="carousel-caption">
+                    <h3>Nettus</h3>
+                    <p>Nettus image Description</p>
+                </div>
+            </div>
+            </div>
+              <a href="#imageCarousel" class="carousel-control left" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>  
+              </a>
+              <a href="#imageCarousel" class="carousel-control right" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+              </a>
+        </div>    
+        </div>
+        <script type="text/javascript">
+            $(document).ready(function(){
+             $(imageCarousel).carousel();   
+            });
+        </script>
+    </body>
+</html>

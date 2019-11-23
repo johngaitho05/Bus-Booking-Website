@@ -1,0 +1,81 @@
+{% extends 'app/base.html' %}
+{% load staticfiles %}
+{% block pagecontent %}
+    <div class="col-md-6 col-sm-12">
+        <div class="home-info">
+            <h1 id='sitebio'>Plan Your journey in advance by booking a seat online</h1>
+            <a href="{% url 'booking' %}" class="btn btn-default btn-lg" id="bookbtn">BOOK NOW</a>
+            <span>
+                CALL US (+254) 710-020-034
+                <small>For any enquiry</small>
+             </span>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-12">
+        <div class="row">
+            {% if view == 'signup' %}
+            <div class="jumbotron" id='form_container'>
+                {% if warning %}
+                    <p style="color:red;font-size: 17px;" class="login-feedback">{{ warning }}</p>
+                {% elif message %}
+                    <p style="color:#4297ff;font-size: 17px;" class="login-feedback">{{ message }}</p>
+                {% endif%}
+                <form action="{% url 'signup' %}" method="post" id="signup_form">
+                    {% csrf_token %}
+                    <div class='row'>
+                        <div class="form-group col-md-6">
+                            <input type="text" placeholder='First Name' class='form-control' id="first_name" name="first_name"/>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="text" placeholder='Last Name' class='form-control' id="last_name" name="last_name"/>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class="form-group col-md-6">
+                            <input type="text" placeholder='Phone Number' class='form-control' id="phone" name="phone"/>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="text" placeholder='Email Address' class='form-control' id="email" name="email"/>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class="form-group col-md-6">
+                            <input type="password" placeholder='Password' class='form-control' id="password1" name="password1"/>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <input type="password" placeholder='Confirm Password' class='form-control' id="password2" name="password2"/>
+                        </div>
+                    </div>
+                    <div class="form-group text-center">
+                        <input type="submit" class="btn btn-info" Value="Create Account" id="registerbtn"/>
+                    </div>
+                    <div class="text-center">
+                        <p id="loginlink"><a href="{%  url 'login' %}">Already have an account?</a></p>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div id="imageCarousel" class="carousel slide" data-interval="2000" data-wrap="true" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#imageCarousel" data-slide-to="0" class="active"></li>
+                    <li data-target="#imageCarousel" data-slide-to="1"></li>
+                    <li data-target="#imageCarousel" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <img src="{% static 'images/bus4.jpg' %}" alt="" class="img-responsive"/>
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'images/bus5.jpg' %}" alt="" class="img-responsive"/>
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'images/bus3.jpg' %}" alt="" class="img-responsive"/>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endif %}
+{% endblock %}
