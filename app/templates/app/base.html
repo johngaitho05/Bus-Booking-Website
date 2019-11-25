@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
 </head>
-<body>
+<body id="body">
 
 <!-- PRE LOADER -->
 <section class="preloader">
@@ -54,7 +54,7 @@
                 <li><a href="#services" class="scroll">Services</a></li>
                 <li><a href="#contact" class="scroll">Contact</a></li>
                 <li><a href="#" class="scroll">About us</a></li>
-               {% if user.is_authenticated %}
+                {% if user.is_authenticated %}
                     <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>
                 {% else %}
                     <li><a href="#" id="btnLoginModal" style="padding-left: 50px">Login</a></li>
@@ -67,9 +67,9 @@
 </section>
 <div id="mySidenav" class="sidenav" data-backdrop=''>
     <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>
-    <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>
-    <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>
+    <a href="#"  onclick="openProfNav()"><i class="fas fa-angle-left arrow"></i> My Account</a>
+    <a href="#"  onclick="openPassNav()"><i class="fas fa-angle-left arrow"></i> Change Password</a>
+    <a href="#"  onclick="openReservationsNav()"><i class="fas fa-angle-left arrow"></i> My reservations</a>
     <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
     <form id="logout_form" method="post" action="{% url 'logout' %}">
         {% csrf_token %}
@@ -77,6 +77,92 @@
     </form>
 </div>
 
+{#User's details sidenav#}
+<div id="profilenav" class="detailedsidenav sidenav" data-backdrop=''>
+    <div class="row">
+        <div class="col-xs-11 col-xs-offset-1">
+            <p class="warning">{{ warning }}</p>
+            <h3 class="text-center">Account Details</h3><br/>
+            <form action="{% url 'update_user' %}" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="form-group">
+                            <label>First Name</label><br/>
+                            <input Value ='{{ user.first_name }}' name="first_name"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="form-group">
+                            <label>Last Name Name</label><br/>
+                            <input Value ='{{ user.last_name }}' name="last_name"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 ">
+                        <div class="form-group">
+                            <label>Phone Number</label><br/>
+                            <input Value ='{{ user.profile.phone }}' name="phone"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="form-group">
+                            <label>Email </label><br/>
+                            <input Value ='{{ user.email }}' name="email"/>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-4 col-md-offset-4 ">
+                        <div class="form-group">
+                            <input type="submit" id="update" value="UPDATE" class="btn btn-warning type=form-control"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{#Change password sidenav#}
+<div id="passnav" class="detailedsidenav sidenav" data-backdrop=''>
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <p class="warning">{{ warning }}</p>
+            <h3 >Change Password</h3><br/>
+            <form id="change_password_form" method="post" action="{% url 'change_password' %}" >
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="password" id="old_password" name="old_password" placeholder="Enter the current passworrd" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="new_password1" name="new_password1" placeholder="Type a new password" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="new_password2" name="new_password2" placeholder="Confirm the new password" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="submit" id="update" value="SUBMIT" class="btn btn-danger type=form-control"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{#User Reservations sidenav#}
+<div id="reservationnav" class="detailedsidenav sidenav" data-backdrop=''>
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            {% if reservations %}
+            {% else %}
+                <h3>You haven't made any reservation</h3>
+            {% endif %}
+        </div>
+    </div>
+</div>
 <!-- HOME -->
 <section id="home" data-stellar-background-ratio="0.5" onclick='closeNav()'>
     <div class="overlay"></div>
@@ -290,31 +376,31 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3">
-                    <p style="color:red;font-size: 17px;" id="login_warning" >{{ warning }}</p>
-                    <p style="color:#4297ff;font-size: 17px;" id="login_message">{{ message }}</p>
+                        <p id="login_warning" class="warning" >{{ warning }}</p>
+                        <p  id="login_message" class="message">{{ message }}</p>
                         <form action="{% url 'login'  %}" id="loginForm" method="post">
-                    {% csrf_token %}
-                    <div class="form-group-lg">
-                        <label for="inputUsername">Email Address</label>
-                        <input type="text" id="inputUsername" class="form-control " name="username"/></div>
+                            {% csrf_token %}
+                            <div class="form-group-lg">
+                                <label for="inputUsername">Email Address</label>
+                                <input type="text" id="inputUsername" class="form-control " name="username"/></div>
 
-                    <div class="form-group-lg">
-                        <label for="inputPassword">Password</label>
-                        <input type="password" id="inputPassword" class="form-control" name="password"/>
-                    </div>
+                            <div class="form-group-lg">
+                                <label for="inputPassword">Password</label>
+                                <input type="password" id="inputPassword" class="form-control" name="password"/>
+                            </div>
                             <div class="form-group-lg">
                                 <input type="hidden" value='{{ where_to }}' name="where_to"/>
                                 <input class="btn btn-default" id="login_button" type="submit" Value="LOGIN" />
                             </div>
-                </form>
+                        </form>
                     </div>
                 </div>
 
             </div>
             <div class="modal-footer">
-{#                <button class="btn btn-default" data-dismiss="modal">Close</button>#}
-{#                <br/>#}
-{#                <a href="{% url 'signup' %} class=text-center">Register Now</a>#}
+                {#                <button class="btn btn-default" data-dismiss="modal">Close</button>#}
+                {#                <br/>#}
+                {#                <a href="{% url 'signup' %} class=text-center">Register Now</a>#}
             </div>
         </div>
     </div>
@@ -337,21 +423,48 @@
         {% if view and view == 'login' %}
             $('#loginModal').modal('show');
             {% if login_warning %}
-            document.getElementById('login_warning').innerHTML = '{{ login_warning }}';
+                document.getElementById('login_warning').innerHTML = '{{ login_warning }}';
             {% elif login_message %}
-            document.getElementById('login_message').innerHTML = '{{ login_message }}';
-                {% endif %}
+                document.getElementById('login_message').innerHTML = '{{ login_message }}';
+            {% endif %}
+        {% endif %}
+        {% if view == 'user_profile'%}
+            document.getElementById("mySidenav").style.width = "20%";
+            document.getElementById("profilenav").style.width = "60%";
+        {% endif %}
+    {% if view == 'change_password'%}
+            document.getElementById("mySidenav").style.width = "20%";
+            document.getElementById("passnav").style.width = "60%";
         {% endif %}
     });
-    /* Set the width of the side navigation to 300px */
+    function openProfNav(){
+        document.getElementById("reservationnav").style.width = "0";
+        document.getElementById("passnav").style.width = "0%";
+        document.getElementById("profilenav").style.width = "60%";
+    }
+    function openPassNav(){
+        document.getElementById("reservationnav").style.width = "0";
+        document.getElementById("profilenav").style.width = "0%";
+        document.getElementById("passnav").style.width = "60%";
+    }
+    function openReservationsNav(){
+        document.getElementById("profilenav").style.width = "0%";
+        document.getElementById("passnav").style.width = "0%";
+        document.getElementById("reservationnav").style.width = "60%";
+    }
+    {#open detailed sidenav#}
     function openNav() {
-        document.getElementById("mySidenav").style.width = "300px";
+        document.getElementById("mySidenav").style.width = "20%";
     }
 
     /* Set the width of the side navigation to 0 */
     function closeNav() {
         document.getElementById("mySidenav").style.width = "0";
+        document.getElementById("profilenav").style.width = "0%";
+        document.getElementById("passnav").style.width = "0%";
+        document.getElementById("reservationnav").style.width = "0";
     }
+
     $('#btnLoginModal').click(function(){
 
         $('#loginModal').modal('show');
@@ -360,8 +473,21 @@
             document.getElementById('loginForm').submit();
         });
         {% if alert_message %}
-            alert("{{ alert_message }}")
+            alert("{{ alert_message }}");
         {% endif %}
+    });
+    function closeNavsByExit() {
+        var allnavs = document.getElementsByClassName('detailedsidenav');
+        for(var i = 0; i < allnavs.length; i++){
+            allnavs[i].style.width = '0';
+        }
+    }
+
+    $('#home').hover(function () {
+        closeNavsByExit();
+    });
+    $('.nav').hover(function () {
+        closeNavsByExit();
     });
 </script>
 </body>

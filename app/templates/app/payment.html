@@ -16,39 +16,39 @@
 <body>
 <div class="container">
     <div class="row">
-            <div class="navbar custom-navbar navbar-fixed-top">
-        <div class="container">
+        <div class="navbar custom-navbar navbar-fixed-top">
+            <div class="container">
 
-            <div class="navbar-header">
-                <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon icon-bar"></span>
-                    <span class="icon icon-bar"></span>
-                    <span class="icon icon-bar"></span>
-                </button>
+                <div class="navbar-header">
+                    <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon icon-bar"></span>
+                        <span class="icon icon-bar"></span>
+                        <span class="icon icon-bar"></span>
+                    </button>
 
-                <!-- lOGO TEXT HERE -->
-                <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
+                    <!-- lOGO TEXT HERE -->
+                    <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
+                </div>
+
+                <!-- MENU LINKS -->
+                <div class="collapse navbar-collapse text-center">
+
+                    <ul class="nav navbar-nav navbar-right ">
+                        <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>
+                    </ul>
+                </div>
+
             </div>
-
-            <!-- MENU LINKS -->
-            <div class="collapse navbar-collapse text-center">
-
-                <ul class="nav navbar-nav navbar-right ">
-                    <li><a href="#" sid="user_id" onclick="openNav()">{{user.username}}</a></li>
-                </ul>
-            </div>
-
         </div>
-    </div>
     </div>
     <div class="row" style="margin-top: 10%;">
         <div class="col-md-6 col-md-offset-3">
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-success active" style="width:75%;">Completed (75%)</div>
-            <p class="text-center">remaining (25%)</p>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-success active" style="width:75%;">Completed (75%)</div>
+                <p class="text-center">remaining (25%)</p>
+            </div>
         </div>
-    </div>
-    <br />
+        <br />
 
     </div>
     <h3 class="text-center">Reservation details</h3>
@@ -89,12 +89,12 @@
                 <div class="input-group">
                     <div class="input-group-addon">Mpesa Number:</div>
                     <input type="text" id='mpesa_number' name='mpesa_number' value="{{phone}}" class="form-control" style="max-width: 200px"/>
-                    <input type="hidden" name='date' value="{{ date }}" />
-                    <input type="hidden" name='time' value="{{ time }}" />
-                    <input type="hidden" name='origin' value="{{ origin }}"/>
-                    <input type="hidden" name='destination' value="{{ destination }}"/>
-                    <input type="hidden" name='amount' value="{{ amount }}"/>
                 </div>
+                <input type="hidden" name='date' value="{{ date }}" />
+                <input type="hidden" name='time' value="{{ time }}" />
+                <input type="hidden" name='origin' value="{{ origin }}"/>
+                <input type="hidden" name='destination' value="{{ destination }}"/>
+                <input type="hidden" name='amount' value="{{ amount }}"/>
             </form>
             <br>
             <h2>Payment mode: Mpesa</h2>
@@ -104,22 +104,22 @@
         </div>
         <div class="col-md-3">
             <br>
-        <button class="btn btn-success btn-lg" id="pay">Proceed to payment</button>
+            <button class="btn btn-success btn-lg" id="pay">Proceed to payment</button>
         </div>
 
     </div>
 </div>
 <div id="mySidenav" class="sidenav" data-backdrop=''>
-        <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>
-        <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>
-        <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>
-        <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
-        <form id="logout_form" method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <input type="hidden"/>
-        </form>
-    </div>
+    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
+    <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>
+    <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>
+    <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>
+    <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
+    <form id="logout_form" method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <input type="hidden"/>
+    </form>
+</div>
 </body>
 <!-- SCRIPTS -->
 <script src="{% static 'js/jquery.js' %}"></script>
@@ -131,7 +131,7 @@
 <script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 <script>
-        /* Set the width of the side navigation to 300px */
+    /* Set the width of the side navigation to 300px */
     function openNav() {
         document.getElementById("mySidenav").style.width = "300px";
         document.getElementById("mySidenav").style.background = '#eaecee';

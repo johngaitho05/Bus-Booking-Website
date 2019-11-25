@@ -40,7 +40,7 @@ def lipa_na_mpesa_online(request):
                     "TransactionDesc": "Testing stk push"
                 }
                 response = requests.post(api_url, json=request, headers=headers)
-                return HttpResponse('success')
+                return HttpResponse('Checkout the mpesa pop up on your phone')
             else:
                 return render(request,'app/index.html',{'alert_message':'invalid Phone number'})
 
@@ -53,8 +53,8 @@ def register_urls(request):
     headers = {"Authorization": "Bearer %s" % access_token}
     options = {"ShortCode": LipanaMpesaPpassword.Business_short_code,
                "ResponseType": "Completed",
-               "ConfirmationURL": "https://91563395.ngrok.io/api/v1/c2b/confirmation",
-               "ValidationURL": "https://91563395.ngrok.io/api/v1/c2b/validation"}
+               "ConfirmationURL": "https://983bace4.ngrok.io/api/v1/c2b/confirmation",
+               "ValidationURL": "https://983bace4.ngrok.io/api/v1/c2b/validation"}
     response = requests.post(api_url, json=options, headers=headers)
     return HttpResponse(response.text)
 @csrf_exempt
