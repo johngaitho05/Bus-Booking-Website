@@ -17,6 +17,18 @@ def getAccessToken(request):
     validated_mpesa_access_token = mpesa_access_token['access_token']
     return HttpResponse(validated_mpesa_access_token)
 
+@csrf_exempt
+def register_urls(request):
+    access_token = MpesaAccessToken.validated_mpesa_access_token
+    api_url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
+    headers = {"Authorization": "Bearer %s" % access_token}
+    options = {"ShortCode": "600247",
+               "ResponseType": "Completed",
+               "ConfirmationURL": "https://559c31a5.ngrok.io/api/v1/c2b/confirmation",
+               "ValidationURL": "https://559c31a5.ngrok.io/api/v1/c2b/validation"}
+    response = requests.post(api_url, json=options, headers=headers)
+    return HttpResponse(response.text)
+
 
 def lipa_na_mpesa_online(request):
     if request.user.is_authenticated:
@@ -46,17 +58,6 @@ def lipa_na_mpesa_online(request):
 
         return render(request, 'app/index.html', {'alert_message': 'phone number is required!'})
 
-@csrf_exempt
-def register_urls(request):
-    access_token = MpesaAccessToken.validated_mpesa_access_token
-    api_url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
-    headers = {"Authorization": "Bearer %s" % access_token}
-    options = {"ShortCode": LipanaMpesaPpassword.Business_short_code,
-               "ResponseType": "Completed",
-               "ConfirmationURL": "https://983bace4.ngrok.io/api/v1/c2b/confirmation",
-               "ValidationURL": "https://983bace4.ngrok.io/api/v1/c2b/validation"}
-    response = requests.post(api_url, json=options, headers=headers)
-    return HttpResponse(response.text)
 @csrf_exempt
 def call_back(request):
     pass
