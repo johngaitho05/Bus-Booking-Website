@@ -25,12 +25,13 @@ SECRET_KEY = '@7xnuha^qc75+9m!b+k66vb2d188pwbq6yfp*rtf^3ca54mx=q'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['559c31a5.ngrok.io','127.0.0.1','localhost' ]
+ALLOWED_HOSTS = ['3512c82a.ngrok.io','127.0.0.1','localhost' ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+
     'mpesa_api.apps.MpesaApiConfig',
     'app.apps.AppConfig',
     'django.contrib.admin',

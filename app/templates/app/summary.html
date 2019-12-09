@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href=" {% static 'css/bootstrap.css' %} " />
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="navbar custom-navbar navbar-fixed-top">
+            <div class="container">
+
+                <div class="navbar-header">
+                    <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon icon-bar"></span>
+                        <span class="icon icon-bar"></span>
+                        <span class="icon icon-bar"></span>
+                    </button>
+
+                    <!-- lOGO TEXT HERE -->
+                    <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
+                </div>
+
+                <!-- MENU LINKS -->
+{#                <div class="collapse navbar-collapse text-center">#}
+{##}
+{#                    <ul class="nav navbar-nav navbar-right ">#}
+{#                        <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>#}
+{#                    </ul>#}
+{#                </div>#}
+
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-success active" style="width:75%;">Completed (75%)</div>
+                <p class="text-center">remaining (25%)</p>
+            </div>
+        </div>
+        <br />
+
+    </div>
+    <h3 class="text-center">Reservation Summary</h3>
+    <br/>
+    <table class="table table-bordered table-condensed table-hover">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Travelling Date</th>
+            <th>Departure Time</th>
+            <th>No of seats</th>
+            <th>Amount</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="active">
+            <td>{{ name }}</td>
+            <td>{{origin}}</td>
+            <td>{{destination}}</td>
+            <td>{{date}}</td>
+            <td>{{time}}</td>
+            <td>{{seats}}</td>
+            <td>Ksh {{amount}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <p>Confirm Your Phone Number. Then click 'Proceed to payment' to generate payment request to your phone.
+        Enter your MPESA PIN on prompt pop-up on your phone to complete the payment.</p>
+    <br/>
+    <div class="row">
+        <div class="col-md-6">
+            <form action="{% url 'lipa_na_mpesa' %}" method="post" id="payment_form">
+                {% csrf_token %}
+                <div class="input-group">
+                    <div class="input-group-addon">Mpesa Number:</div>
+                    <input type="text" id='mpesa_number' name='mpesa_number' value="{{phone}}" class="form-control" style="max-width: 200px"/>
+                </div>
+{#                <input type="hidden" name='date' value="{{ date }}" />#}
+{#                <input type="hidden" name='time' value="{{ time }}" />#}
+{#                <input type="hidden" name='origin' value="{{ origin }}"/>#}
+{#                <input type="hidden" name='destination' value="{{ destination }}"/>#}
+                <input type="hidden" name='amount' value="{{ amount }}"/>
+                <input type="hidden"  name="booking_id" value='{{ booking_id }}'/>
+
+            </form>
+            <br>
+            <h2>Payment mode: Mpesa</h2>
+        </div>
+        <div class="col-md-3">
+            <h3>Amount: <span style="color:rgb(255, 87, 51);padding-left: 10px">Ksh {{ amount }}</span></h3>
+        </div>
+        <div class="col-md-3">
+            <br>
+            <button class="btn btn-success btn-lg" id="pay">Proceed to payment</button>
+        </div>
+
+    </div>
+</div>
+{#<div id="mySidenav" class="sidenav" data-backdrop=''>#}
+{#    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>#}
+{#    <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>#}
+{#    <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>#}
+{#    <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>#}
+{#    <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>#}
+{#    <form id="logout_form" method="post" action="{% url 'logout' %}">#}
+{#        {% csrf_token %}#}
+{#        <input type="hidden"/>#}
+{#    </form>#}
+{#    <form id="delete_booking_form" method="post" action="{% url 'delete_booking' %}">#}
+{#        {% csrf_token %}#}
+{#        <input type="hidden" id="booking_id" name="booking_id" value='{{ booking_id }}'/>#}
+{#    </form>#}
+{#</div>#}
+</body>
+<!-- SCRIPTS -->
+<script src="{% static 'js/jquery.js' %}"></script>
+{#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
+<script src="{% static 'js/jquery.stellar.js' %}"></script>
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'js/smoothscroll.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+<script>
+{#    $(document).ready(function(){#}
+{#   let form = document.getElementById('delete_booking_form');#}
+{#   form.submit(function(){#}
+{#      $.post($(this).attr('action'), $(this).serialize(), function(response){#}
+{#            // do something here on success#}
+{#      },'json');#}
+{#      return false;#}
+{#   });#}
+{#        form.submit();#}
+{#    });#}
+{#    /* Set the width of the side navigation to 300px */#}
+{#    function openNav() {#}
+{#        document.getElementById("mySidenav").style.width = "300px";#}
+{#        document.getElementById("mySidenav").style.background = '#eaecee';#}
+{#    }#}
+{##}
+{#    /* Set the width of the side navigation to 0 */#}
+{#    function closeNav() {#}
+{#        document.getElementById("mySidenav").style.width = "0";#}
+{#    }#}
+    $('#pay').click(function(){
+        document.getElementById('payment_form').submit();
+    });
+</script>
+</html>

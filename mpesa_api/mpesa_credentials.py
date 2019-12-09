@@ -18,7 +18,7 @@ class MpesaAccessToken:
     validated_mpesa_access_token = mpesa_access_token['access_token']
 
 
-class LipanaMpesaPpassword:
+class LipanaMpesaPassword:
     lipa_time = datetime.now().strftime('%Y%m%d%H%M%S')
     Business_short_code = "174379"
     passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'

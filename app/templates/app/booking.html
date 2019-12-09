@@ -4,16 +4,64 @@
         <div class="jumbotron" id="booking_container">
             <h3 CLASS='text-center'>BOOKING FORM</h3>
             <p style="color:red;font-size:15px">{{ booking_warning }}</p>
-            <form id="booking_form" action="{% url 'booking' %}" method="post">
+            {% if available_seats %}
+                <form id="booking_form" action="{% url 'booking' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label for="origin" class="control-label">Origin</label>
+                                <select class="form-control" name='origin' id='origin' readonly="">
+                                    <Option>{{origin}}</Option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label for="destination" class="control-label">Destination</label>
+                                <select class="form-control" name="destination" id='destination' readonly="">
+                                    <Option>{{destination}}</Option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label for="booking_date">Date</label>
+                                <input type="date" id='booking_date' name='booking_date' value="{{ date }}" class='form-control' readonly/>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group ">
+                                <label for="booking_date">Time</label>
+                                <select class="form-control" name="booking_time" id='booking_time' readonly="">
+                                    <Option>{{time}}</Option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-12 ">
+                            <div class='form-group'>
+                                <label for="seats" style='display:inline !important'>Number of seats</label>
+                                <input type="number" max="{{available_seats}}" min="1" class="form-control" id='seats' name='seats' style='display: inline !important; width:50%'/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" class='btn btn-primary' id='booking_submit' value="Proceed"/>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <form id="booking_form" action="{% url 'check_seats' %}" method="post">
                 {% csrf_token %}
-                <div class="row">
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="origin" class="control-label">Origin</label>
                             <select class="form-control" name='origin' id='origin'>
-                                <Option>Select</Option>
-                                {% for route in routes %}
-                                    <Option>{{route.origin}}</Option>
+                                <Option value="">Select</Option>
+                                {% for origin in origins %}
+                                    <Option>{{origin}}</Option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -22,9 +70,9 @@
                         <div class="form-group ">
                             <label for="destination" class="control-label">Destination</label>
                             <select class="form-control" name="destination" id='destination'>
-                                <Option>Select</Option>
-                                {% for route in routes %}
-                                    <Option>{{route.destination}}</Option>
+                                <Option value="">Select</Option>
+                                {% for destination in destinations %}
+                                    <Option>{{destination}}</Option>
                                 {% endfor %}
 
                             </select>
@@ -34,7 +82,7 @@
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="booking_date">Date</label>
-                            <input type="date" id='booking_date' name='booking_date' class='form-control'/>
+                            <input type="date" min="{{min_date}}" max={{ max_date }} id='booking_date' name='booking_date' class='form-control'/>
 
                         </div>
                     </div>
@@ -71,21 +119,20 @@
 
                         </div>
                     </div>
-                    <div class="col-md-12 ">
-                        <div class='form-group'>
-                            <label for="seats" style='display:inline !important'>Number of seats</label>
-                            <input type="number" class="form-control" id='seats' name='seats' style='display: inline !important; width:50%'/>
-
-                        </div>
-                    </div>
                     <div class="form-group">
-                        <input type="submit" class='btn btn-primary' id='booking_submit' value="Proceed"/>
+                        <input type="submit" class='btn btn-primary' id='booking_submit' value="Check available seats"/>
                     </div>
-                </div>
-            </form>
+                </form>
+            {% endif %}
         </div>
-
     </div>
+    "{% if available_seats %}"
+    <div class="col-md-3">
+        <div id="available_seats">
+            <h4>Available seats: {{ available_seats }}</h4>
+        </div>
+    </div>
+{% endif %}
 
 {% endblock %}
 

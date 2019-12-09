@@ -443,9 +443,10 @@ margin-right: 20px;
       text-decoration: underline !important;
   }
   #imageCarousel{
-      max-width:500px;
+      max-width:550px;
       height:auto;
       overflow-x: hidden;
+      border-radius:8px;
   }
   #logo{
       font-family: 'Bad Script', cursive;
@@ -461,6 +462,11 @@ margin-right: 20px;
   #bookbtn:hover{
     background-color: #5cb85c;
     color:white;
+  }
+  #available_seats{
+    background:papayawhip;
+    margin-top:150px;
+    padding:5px;
   }
   
   

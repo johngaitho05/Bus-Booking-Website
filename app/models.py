@@ -18,3 +18,18 @@ class Route(models.Model):
     def __str__(self):
         return self.origin + "-"+ self.destination
 
+
+class Booking(models.Model):
+    name = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    date = models.DateField()
+    time = models.TimeField()
+    seats = models.IntegerField()
+    amount = models.IntegerField()
+    paid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.name)
+
+

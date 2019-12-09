@@ -1,53 +1,31 @@
-from django.shortcuts import render,redirect
+from datetime import datetime, date, time, timedelta
+import time
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from .models import Profile,Route
-from django.contrib.auth import authenticate,logout,login
+from .models import Profile, Route, Booking
+from mpesa_api.mpesa_credentials import LipanaMpesaPassword
+from django.contrib.auth import authenticate, logout, login
 import re
 from django.contrib import messages
 
 
 def loginRequired(func):
-    def wrapper(request,*args,**kwargs):
+    def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
-        return func(request,*args,**kwargs)
+        return func(request, *args, **kwargs)
+
     return wrapper
 
 
 def check_authentication(func):
-    def wrapper(request,*args,**kwargs):
+    def wrapper(request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('home')
-        return func(request,*args,**kwargs)
+        return func(request, *args, **kwargs)
+
     return wrapper
 
-
-def home_view(request):
-    return render(request,'app/index.html',{'view':'none'})
-
-
-def booking_view(request):
-    if not request.user.is_authenticated:
-        return render(request,'app/index.html',{'view':'login','login_message':'Please login to continue', 'where_to':'booking'})
-    routes = Route.objects.all()
-    if request.method == 'POST':
-        if request.POST['origin'] and request.POST['destination'] and request.POST['booking_date'] and request.POST['booking_time'] and request.POST['seats']:
-            name =request.user.first_name + " " + request.user.last_name
-            origin = request.POST['origin']
-            destination = request.POST['destination']
-            date = request.POST['booking_date']
-            time = request.POST['booking_time']
-            seats = request.POST['seats']
-            phone = request.user.profile.phone
-            try:
-                route = Route.objects.get(origin=origin,destination=destination)
-                amount = int(route.cost)* int(seats)
-                return render(request,'app/payment.html',{'name':name, 'origin':origin,'destination':destination,'date':date,'time':time,'seats':seats,'amount':amount,'phone':phone})
-            except Route.DoesNotExist:
-                return render(request, 'app/booking.html', {'routes':routes, 'booking_warning': 'None of our vehicles passes through that route. Try another route'})
-        else:
-            return redirect('booking',{'routes':routes,'booking_warning':'All fields are required'})
-    return render(request,'app/booking.html',{'routes':routes})
 
 @check_authentication
 def login_view(request):
@@ -55,24 +33,27 @@ def login_view(request):
         if request.POST['username'] and request.POST['password']:
             username = request.POST['username']
             password = request.POST['password']
-            user = authenticate(username = username,password = password)
+            user = authenticate(username=username, password=password)
             if user is not None:
                 if user.is_active:
-                    login(request,user)
+                    login(request, user)
                     if request.POST['where_to']:
                         return redirect(str(request.POST['where_to']))
                     else:
                         return redirect('home')
                 else:
                     # print 'The password is valid,but the account has been disabled'
-                    return render(request,'app/index.html',{'view':'login','login_waring':'Your account has been suspended'})
+                    return render(request, 'app/index.html',
+                                  {'view': 'login', 'login_waring': 'Your account has been suspended'})
             else:
-                return render(request,'app/index.html',{'view':'login','login_warning':'Invalid username or password'})
-    return render(request,'app/index.html',{'view':'login'})
+                return render(request, 'app/index.html',
+                              {'view': 'login', 'login_warning': 'Invalid username or password'})
+    return render(request, 'app/index.html', {'view': 'login'})
+
 
 @check_authentication
 def signup_view(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         email = request.POST['email']
@@ -105,14 +86,14 @@ def signup_view(request):
                             login(request, user)
                             return redirect('home')
                         elif not number_is_correct(number):
-                            return render (request,'app/index.html',
-                                           {'view':'signup','warning':"Invalid Phone number. Please try again"})
+                            return render(request, 'app/index.html',
+                                          {'view': 'signup', 'warning': "Invalid Phone number. Please try again"})
 
                         else:
                             return render(request, 'app/index.html',
                                           {'view': 'signup', 'warning': "Invalid Email Address.Please try again "})
             else:
-                return render(request, 'app/index.html', {'warning': "Password do not match",'view':'signup'})
+                return render(request, 'app/index.html', {'warning': "Password do not match", 'view': 'signup'})
         else:
             return render(request, 'app/index.html', {'warning': "All fields are required", 'view': 'signup'})
 
@@ -123,21 +104,8 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
-@loginRequired
-def payment_view(request):
-    if request.method == 'POST':
-        name = request.user.first_name + request.user.first_name
-        date = request.POST['date']
-        time = request.POST['time']
-        origin = request.POST['origin']
-        destination = request.POST['destination']
-        amount = request.POST['amount']
-        if name and date and time and origin and destination and amount:
-            return render (request, 'app/payment.html', {'name':name, 'date':date, 'time':time, 'origin':origin, 'destination':destination, 'amount':amount})
-        else:
-            return redirect('booking',{'message':'all fields are reqiured'})
 
-
+# page for editing user details
 @loginRequired
 def update_user(request):
     if request.method == 'POST':
@@ -147,25 +115,28 @@ def update_user(request):
         email = request.POST['email']
         if fname and lname and number and email:
             if number_is_correct(number) and email_is_correct(email):
-                user = User.objects.get(username = request.user.username)
+                user = User.objects.get(username=request.user.username)
                 user.first_name = fname
-                user.last_name =lname
+                user.last_name = lname
                 user.username = email
                 user.email = email
-                user_profile = Profile.objects.get(phone = user.profile.phone)
+                user_profile = Profile.objects.get(phone=user.profile.phone)
                 user_profile.phone = format_number(number)
                 user.save()
                 user_profile.save()
                 logout(request)
-                return render(request,'app/index.html',{'view':'login','message':'Account updated, login to continue'})
+                return render(request, 'app/index.html',
+                              {'view': 'login', 'message': 'Account updated, login to continue'})
             elif not number_is_correct(number):
-                return render(request,'app/index.html',{'view':'user_profile','warning':'Invalid phone number'})
+                return render(request, 'app/index.html', {'view': 'user_profile', 'warning': 'Invalid phone number'})
             else:
                 return render(request, 'app/index.html', {'view': 'user_profile', 'warning': 'Invalid Email Address'})
         else:
-            return render(request, 'app/index.html', {'view': 'user_profile', 'warning': 'Please fill in the missing fields'})
+            return render(request, 'app/index.html',
+                          {'view': 'user_profile', 'warning': 'Please fill in the missing fields'})
 
 
+# page for changing password
 @loginRequired
 def update_password(request):
     if request.method == 'POST':
@@ -177,17 +148,18 @@ def update_password(request):
             if newpass1 == newpass2:
                 user = authenticate(username=username, password=oldpass)
                 if user is not None:
-                        user.set_password(newpass1)
-                        user.save()
-                        logout(request)
-                        return render(request, 'app/index.html',
-                                      {'view':'login','message':'Password changed successfully. Login to continue'})
+                    user.set_password(newpass1)
+                    user.save()
+                    logout(request)
+                    return render(request, 'app/index.html',
+                                  {'view': 'login', 'message': 'Password changed successfully. Login to continue'})
                 else:
                     return render(request, 'app/index.html',
-                                  {'view':'change_password','warning': 'The old password is incorrect'})
+                                  {'view': 'change_password', 'warning': 'The old password is incorrect'})
             else:
-                return render(request, 'app/index.html',{'view':''
-                     'change_password','warning':'New passwords do not match'})
+                return render(request, 'app/index.html', {'view': ''
+                                                                  'change_password',
+                                                          'warning': 'New passwords do not match'})
 
         else:
             return render(request, 'app/index.html', {'view': ''
@@ -196,10 +168,115 @@ def update_password(request):
     return redirect('home')
 
 
+# the homepage view
+def home_view(request):
+    return render(request, 'app/index.html', {'view': 'none'})
 
 
+# checking available seats
+@loginRequired
+def checkseats(request):
+    if request.method == 'POST':
+        origin = request.POST['origin']
+        destination = request.POST['destination']
+        date = str(request.POST['booking_date'])
+        time = str(request.POST['booking_time'])
+        routes = Route.objects.all()
+        if origin and destination and time and date:
+            try:
+                formatted_date = datetime.strptime(date, "%Y-%m-%d")
+                formatted_time = datetime.strptime(time + ':00', "%H:%M:%S")
+                bookings = Booking.objects.filter(origin=origin, destination=destination,
+                                                  date=formatted_date, time=formatted_time)
+                bookings_list = [booking for booking in bookings]
+                n = len(bookings_list) - 1
+                booked_seats = 0
+                while n >= 0:
+                    booked_seats += bookings_list[n].seats
+                    n -= 1
+                if booked_seats <= 59:
+                    return render(request, "app/booking.html",
+                                  {'available_seats': 60 - booked_seats, "origin": origin,
+                                   'destination': destination, 'date': date, 'time': time})
+            except Booking.DoesNotExist:
+                return render(request, "app/booking.html",
+                              {'available_seats': 60, "origin": origin,
+                               'destination': destination, 'date': date, 'time': time})
+        return render(request, 'app/booking.html', {'routes': routes, 'booking_warning': 'Missing fields detected'})
+    return redirect('booking')
 
 
+today = date.today()
+future = today + timedelta(weeks=1)
+
+
+# str_today = date.strftime(today, "%d-%m-%Y")
+# str_future = date.strftime(future, "%d-%m-%Y")
+
+
+# the booking page view
+def booking_view(request):
+    if not request.user.is_authenticated:
+        return render(request, 'app/index.html',
+                      {'view': 'login', 'login_message': 'Please login to continue', 'where_to': 'booking'})
+    routes = getroutes()
+    if request.method == 'POST':
+        name = request.user.first_name + " " + request.user.last_name
+        origin = request.POST['origin']
+        destination = request.POST['destination']
+        date = request.POST['booking_date']
+        time = request.POST['booking_time']
+        seats = request.POST['seats']
+        phone = request.user.profile.phone
+        if origin and destination and time and date and seats:
+            try:
+                route = Route.objects.get(origin=origin, destination=destination)
+                amount = int(route.cost) * int(seats)
+                booking = Booking.objects.create(name=name, origin=origin, destination=destination,
+                                                 date=date, time=time, seats=seats, amount=amount)
+                booking_id = booking.id
+                return render(request, 'app/summary.html', {'name': name,
+                                                            'origin': origin, 'destination': destination, 'date': date,
+                                                            'time': time, 'seats': seats, 'amount': amount,
+                                                            'phone': phone,
+                                                            'booking_id': booking_id})
+            except Route.DoesNotExist:
+                return render(request, 'app/booking.html',
+                              {'routes': routes, 'booking_warning':
+                                  'None of our vehicles passes through that route. Try another route'
+                                  , 'min_date': today, 'max_date': future})
+        return render(request, 'app/booking.html', {'origins': routes['origins'],
+                                                    'destinations': routes['destinations'], 'booking_warning':
+                                                        'Missing fields detected', 'min_date': today,
+                                                    'max_date': future})
+    return render(request, 'app/booking.html', {'origins': routes['origins'], 'destinations': routes['destinations']
+        , 'min_date': str(today), 'max_date': str(future)})
+
+# the payment page view
+@loginRequired
+def summary(request):
+    if request.method == 'POST':
+        name = request.user.first_name + request.user.first_name
+        date = request.POST['date']
+        time = request.POST['time']
+        origin = request.POST['origin']
+        destination = request.POST['destination']
+        amount = request.POST['amount']
+        if name and date and time and origin and destination and amount:
+            return render(request, 'app/summary.html',
+                          {'name': name, 'date': date, 'time': time, 'origin': origin, 'destination': destination,
+                           'amount': amount})
+        else:
+            return redirect('booking', {'message': 'Blank fields detected'})
+
+
+def payment_view(request, booking_id):
+    booking = Booking.objects.get(id=booking_id)
+    phone= request.user.profile.phone
+    return render(request, 'app/payment.html',{'booking': booking,'paybill':LipanaMpesaPassword.Business_short_code,'phone':phone})
+
+
+# function to check if the entered phone number is correct
 def number_is_correct(number):
     try:
         print(int(number))
@@ -212,6 +289,7 @@ def number_is_correct(number):
         return False
 
 
+# formatting the phone number before saving
 def format_number(number):
     if number[0] == '0':
         formatted_number = '254' + number[1:]
@@ -222,6 +300,7 @@ def format_number(number):
     return formatted_number
 
 
+# checking whether the entered email is correct using regex
 def email_is_correct(email):
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     if re.search(regex, email):
@@ -230,3 +309,25 @@ def email_is_correct(email):
         return False
 
 
+# querying all available routes from the database
+def getroutes():
+    routes = Route.objects.all()
+    if routes:
+        origins = set([route.origin for route in routes])
+        destinations = set([route.destination for route in routes])
+        routes_dict = {'origins': origins, 'destinations': destinations}
+        return routes_dict
+    return {"origins": [], 'destinations': []}
+
+
+@loginRequired
+def delete_booking(request):
+    if request.method == 'POST':
+        boom = 600
+        while boom > 0:
+            time.sleep(1)
+            boom -= 1
+        booking = Booking.objects.get(id=int(request.POST['booking_id']))
+        if booking.paid is False:
+            booking.delete()
+            return redirect('home')
