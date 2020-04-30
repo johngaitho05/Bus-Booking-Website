@@ -1,5 +1,16 @@
 {% extends 'app/base.html' %}
-{% block pagecontent%}
+{#{% block navbar %}#}
+{#    <ul class="nav navbar-nav navbar-left" id="top-menu">#}
+{#        <li><a href="{% url 'home' %}" class="scroll">Home</a></li>#}
+{#        <li><a href="#about" class="scroll">About us</a></li>#}
+{#        <li><a href="#destinations" class="scroll">Destinations</a></li>#}
+{#        <li><a href="#services" class="scroll">Services</a></li>#}
+{#        <li><a href="#contact" class="scroll">Contact</a></li>#}
+{#        <li class="active"><a href="#booking">Booking</a></li>#}
+{#    </ul>#}
+{#{% endblock %}#}
+
+{% block homecontent %}
     <div class="col-md-6 col-md-offset-3">
         <div class="jumbotron" id="booking_container">
             <h3 CLASS='text-center'>BOOKING FORM</h3>
@@ -54,7 +65,7 @@
                 </form>
             {% else %}
                 <form id="booking_form" action="{% url 'check_seats' %}" method="post">
-                {% csrf_token %}
+                    {% csrf_token %}
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="origin" class="control-label">Origin</label>
@@ -135,5 +146,6 @@
 {% endif %}
 
 {% endblock %}
+
 
 

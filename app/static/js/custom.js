@@ -4,9 +4,9 @@
 
     // PRE LOADER
     $(window).load(function(){
-      $('.preloader').fadeOut(1000); // set duration in brackets    
+      $('.preloader').fadeOut(1000); // set duration in brackets
     });
-    
+
 
     // MENU
     $('.navbar-collapse a').on('click',function(){
@@ -20,12 +20,12 @@
             $(".navbar-fixed-top").removeClass("top-nav-collapse");
           }
     });
-    
+
 
     // PARALLAX EFFECT
     $.stellar({
       horizontalScrolling: false,
-    }); 
+    });
 
 
     // MAGNIFIC POPUP
@@ -52,18 +52,6 @@
         }
       }
     });
-
-
-    // SMOOTH SCROLL
-    $(function() {
-      $('.custom-navbar a, #home a').on('click', function(event) {
-        var $anchor = $(this);
-          $('html, body').stop().animate({
-            scrollTop: $($anchor.attr('href')).offset().top - 49
-          }, 1000);
-            event.preventDefault();
-      });
-    });  
 
 })(jQuery);
 

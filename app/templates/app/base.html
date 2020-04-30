@@ -4,14 +4,9 @@
     {% load staticfiles %}
 
     <title>Guardian Coach</title>
-    <!--
-    Hydro Template
-    http://www.templatemo.com/tm-509-hydro
-    -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
     <link rel="stylesheet" href=" {% static 'css/bootstrap.css'%} " />
@@ -46,23 +41,28 @@
 
         <!-- MENU LINKS -->
         <div class="collapse navbar-collapse text-center">
-
-            <ul class="nav navbar-nav navbar-right ">
-                <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                <li><a href="#destinations" class="scroll">Destinations</a></li>
-                <li><a href="{% url 'booking' %}" >Booking</a></li>
-                <li><a href="#services" class="scroll">Services</a></li>
-                <li><a href="#contact" class="scroll">Contact</a></li>
-                <li><a href="#" class="scroll">About us</a></li>
+            {% block navbar %}
+                <ul class="nav navbar-nav navbar-left" id="top-menu">
+                    <li class="active"><a href="#home" class="scroll">Home</a></li>
+                    <li><a href="#about" class="scroll">About us</a></li>
+                    <li><a href="#destinations" class="scroll">Destinations</a></li>
+                    <li><a href="#services" class="scroll">Services</a></li>
+                    <li><a href="#contact" class="scroll">Contact</a></li>
+                </ul>
+            {% endblock %}
+            <ul class="nav navbar-nav navbar-right" >
                 {% if user.is_authenticated %}
-                    <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>
+                    <li id="user_id">
+                        <a href="#" onclick="openNav()">{{user.username}}</a>
+                    </li>
                 {% else %}
+
                     <li><a href="#" id="btnLoginModal" style="padding-left: 50px">Login</a></li>
-                    <li><a href="{%  url 'signup' %}">Register</a></li>
+                    <li><a id="user_id" href="{%  url 'signup' %}">Register</a></li>
+
                 {% endif %}
             </ul>
         </div>
-
     </div>
 </section>
 <div id="mySidenav" class="sidenav" data-backdrop=''>
@@ -168,9 +168,35 @@
     <div class="overlay"></div>
     <div class="container">
         <div class="row">
-            {% block pagecontent %}
+            {% block homecontent %}
             {% endblock %}
+        </div>
+    </div>
+</section>
 
+<!--ABOUT US-->
+<section id="about" data-stellar-background-ratio="0.5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-12 col-sm-12">
+                <div class="section-title">
+                    <h2>About Us</h2>
+                    <span class="line-bar">...</span>
+                </div>
+            </div>
+            <div class="about-us-inner-div">
+                <p>The YK Travellers is a Bus Service Company that was established in 2016 and which
+                    provides travelers with genuine comfort
+                    they deserve - from the time you book your ticket to the time you board the bus.
+                    YK Travellers is driven by young entrepreneurs who are passionate about solving real
+                    everyday problems by making simple and powerful solutions. Their idea was born in response
+                    to the 2016 Hult Prize Challenge (www.hultprize.com) a global student competition for social
+                    entrepreneurship, which launches students into developing scalable business models in order
+                    to solve global challenges. The team is motivated by the idea of transforming inefficient transport
+                    systems into a catalyst for growth and impact, in order to connect people to opportunities.
+                </p>
+                <p>We are located in Nairobi along Haile selassie avenue Opposite Railways</p>
+            </div>
         </div>
     </div>
 </section>
@@ -232,26 +258,26 @@
             </div>
 
             <div class="col-md-6 col-sm-6">
-                <!-- BLOG THUMB -->
-                <div class="media blog-thumb">
+                <!-- SERVICE THUMB -->
+                <div class="media service-thumb">
                     <div class="media-object media-left">
                         <a href="#"><img src="{% static 'images/bus.jpg' %}" class="img-responsive" alt="" height="100"></a>
                     </div>
-                    <div class="media-body blog-info">
+                    <div class="media-body service-info">
                         <h3><a href="#">Reservation</a></h3>
                         <p>You can have your seat(s) reserved  by sending your payment via mpesa </p>
-                        <a href="#" class="btn section-btn">Grab your seat</a>
+                        <a href="{% url 'booking' %}" class="btn section-btn">Grab your seat</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6 col-sm-6">
-                <!-- BLOG THUMB -->
-                <div class="media blog-thumb">
+                <!-- SERVICE THUMB -->
+                <div class="media service-thumb">
                     <div class="media-object media-left">
                         <a href="#"><img src="{% static 'images/bus2.jpg' %}" class="img-responsive" alt=""></a>
                     </div>
-                    <div class="media-body blog-info">
+                    <div class="media-body service-info">
                         <h3><a href="#">Renting</a></h3>
                         <p>We lease buses at affordable prices and they comes with a driver </p>
                         <a href="#" class="btn section-btn">Book a bus</a>
@@ -354,11 +380,14 @@
                 <p>City, State, 00000</p>
                 <p>City, State, 00000</p>
             </div>
-            <div class="col-12">
+            <div class="col-12 text-center">
                 <hr class="light-100" />
-                <h4 style="color:#FFFFCC">&copy; theguardian.co.ke</h4>
+                <h4 id="mcopyright">&copy; yktravellers.co.ke
+                    <span> Powered by
+                        <a href="https://ramabot.chat/"  target="_blank"> ramabot</a>
+                    </span>
+                </h4>
             </div>
-
         </div>
     </div>
 </footer>
@@ -398,27 +427,24 @@
 
             </div>
             <div class="modal-footer">
-                {#                <button class="btn btn-default" data-dismiss="modal">Close</button>#}
-                {#                <br/>#}
-                {#                <a href="{% url 'signup' %} class=text-center">Register Now</a>#}
+                <button class="btn btn-default" data-dismiss="modal">Close</button>
+                <br/>
+                <a href="{% url 'signup' %} class=text-center">Register Now</a>
             </div>
         </div>
     </div>
 </div>
-
+{#<iframe src="https://ramabot.chat/v2/link.html?id=b191a09b-245b-48a0-8c66-5a4d58e30898"  width="100%" height="600" frameBorder="0"></iframe>#}
 <!-- SCRIPTS -->
 <script src="{% static 'js/jquery.js' %}"></script>
-{#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
-<script src="{% static 'js/jquery.stellar.js' %}"></script>
+<script src="{% static 'js/jquery.stellar.min.js' %}"></script>
 <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
-<script src="{% static 'js/smoothscroll.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
-{#<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js"></script>#}
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 
-
-<script>
+<script type="text/javascript">
     $(document).ready(function(){
         {% if view and view == 'login' %}
             $('#loginModal').modal('show');
@@ -432,9 +458,20 @@
             document.getElementById("mySidenav").style.width = "20%";
             document.getElementById("profilenav").style.width = "60%";
         {% endif %}
-    {% if view == 'change_password'%}
+        {% if view == 'change_password'%}
             document.getElementById("mySidenav").style.width = "20%";
             document.getElementById("passnav").style.width = "60%";
+        {% endif %}
+    });
+    $('#btnLoginModal').click(function(){
+
+        $('#loginModal').modal('show');
+
+        $('#login_button').click(function(){
+            document.getElementById('loginForm').submit();
+        });
+        {% if alert_message %}
+            alert("{{ alert_message }}");
         {% endif %}
     });
     function openProfNav(){
@@ -452,7 +489,6 @@
         document.getElementById("passnav").style.width = "0%";
         document.getElementById("reservationnav").style.width = "60%";
     }
-    {#open detailed sidenav#}
     function openNav() {
         document.getElementById("mySidenav").style.width = "20%";
     }
@@ -465,17 +501,6 @@
         document.getElementById("reservationnav").style.width = "0";
     }
 
-    $('#btnLoginModal').click(function(){
-
-        $('#loginModal').modal('show');
-
-        $('#login_button').click(function(){
-            document.getElementById('loginForm').submit();
-        });
-        {% if alert_message %}
-            alert("{{ alert_message }}");
-        {% endif %}
-    });
     function closeNavsByExit() {
         var allnavs = document.getElementsByClassName('detailedsidenav');
         for(var i = 0; i < allnavs.length; i++){
@@ -489,7 +514,66 @@
     $('.nav').hover(function () {
         closeNavsByExit();
     });
+
 </script>
+<script type="text/javascript">
+    let lastId,
+        topMenu = $("#top-menu"),
+        topMenuHeight = topMenu.outerHeight() + 15,
+        // All list items
+        menuItems = topMenu.find("a"),
+        // Anchors corresponding to menu items
+        scrollItems = menuItems.map(function () {
+            var item = $($(this).attr("href"));
+            if (item.length) {
+                return item;
+            }
+        });
+
+    // Bind click handler to menu items
+    // so we can get a fancy scroll animation
+    menuItems.click(function(e){
+        const href = $(this).attr("href"),
+            offsetTop = href === "#" ? 0 : $(href).offset().top - topMenuHeight + 1;
+        $('html, body').stop().animate({
+            scrollTop: offsetTop
+        }, 800);
+        e.preventDefault();
+    });
+
+    // Bind to scroll
+    $(window).scroll(function(){
+        // Get container scroll position
+        const fromTop = $(this).scrollTop() + topMenuHeight;
+
+        // Get id of current scroll item
+        let cur = scrollItems.map(function () {
+            if ($(this).offset().top < fromTop)
+                return this;
+        });
+        // Get the id of the current element
+        cur = cur[cur.length-1];
+        const id = cur && cur.length ? cur[0].id : "";
+
+        if (lastId !== id) {
+            lastId = id;
+            // Set/remove active class
+            menuItems
+                .parent().removeClass("active")
+                .end().filter("[href='#"+id+"']").parent().addClass("active");
+        }
+    });
+</script>
+{#<script async>#}
+{#    (function(w, d) {#}
+{#        w['rama-bot'] = {"id":"b191a09b-245b-48a0-8c66-5a4d58e30898"};#}
+{#        const h = d.head || d.getElementsByTagName("head")[0];#}
+{#        const s = d.createElement("script");#}
+{#        s.setAttribute("type", "text/javascript");#}
+{#        s.setAttribute("src", "https://ramabot.chat/launcher-v2.js");#}
+{#        h.appendChild(s);#}
+{#    })(window, document);#}
+{#</script>#}
 </body>
 
 </html>

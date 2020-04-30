@@ -1,6 +1,6 @@
 {% extends 'app/base.html' %}
 {% load staticfiles %}
-{% block pagecontent %}
+{% block homecontent %}
     <div class="col-md-6 col-sm-12">
         <div class="home-info">
             <h1 id='sitebio'>Plan Your journey in advance by booking a seat online</h1>
@@ -53,7 +53,7 @@
                             <input type="submit" class="btn btn-info" Value="Create Account" id="registerbtn"/>
                         </div>
                         <div class="text-center">
-                            <p id="loginlink"><a href="{%  url 'login' %}">Already have an account?</a></p>
+                            <p id="loginlink" >Already have an account? <a href="{%  url 'login' %}">Login</a></p>
                         </div>
                     </form>
                 </div>
@@ -76,9 +76,7 @@
                         </div>
                     </div>
                 </div>
-
                 </div>
                 </div>
-
             {% endif %}
 {% endblock %}

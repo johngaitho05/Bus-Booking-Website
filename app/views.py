@@ -331,3 +331,5 @@ def delete_booking(request):
         if booking.paid is False:
             booking.delete()
             return redirect('home')
+
+
