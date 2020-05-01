@@ -16,20 +16,18 @@ class Route(models.Model):
     cost = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.origin + "-"+ self.destination
+        return self.origin + "-" + self.destination
 
 
 class Booking(models.Model):
-    name = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     origin = models.CharField(max_length=100)
     destination = models.CharField(max_length=100)
-    date = models.DateField()
-    time = models.TimeField()
-    seats = models.IntegerField()
+    booking_time = models.DateTimeField(auto_now_add=True)
+    travelling_time = models.DateTimeField(auto_now_add=True)
+    no_of_seats = models.IntegerField()
     amount = models.IntegerField()
     paid = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.name)
-
-
+        return self.user.username

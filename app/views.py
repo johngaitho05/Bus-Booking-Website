@@ -1,7 +1,10 @@
 from datetime import datetime, date, time, timedelta
 import time
+from django.http.response import JsonResponse, Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+
 from .models import Profile, Route, Booking
 from mpesa_api.mpesa_credentials import LipanaMpesaPassword
 from django.contrib.auth import authenticate, logout, login
@@ -179,13 +182,13 @@ def checkseats(request):
     if request.method == 'POST':
         origin = request.POST['origin']
         destination = request.POST['destination']
-        date = str(request.POST['booking_date'])
-        time = str(request.POST['booking_time'])
+        booking_date = request.POST['booking_date']
+        booking_time = request.POST['booking_time']
         routes = Route.objects.all()
-        if origin and destination and time and date:
+        if origin and destination and booking_time and booking_date:
             try:
-                formatted_date = datetime.strptime(date, "%Y-%m-%d")
-                formatted_time = datetime.strptime(time + ':00', "%H:%M:%S")
+                formatted_date = datetime.strptime(booking_date, "%Y-%m-%d")
+                formatted_time = datetime.strptime(booking_time + ':00', "%H:%M:%S")
                 bookings = Booking.objects.filter(origin=origin, destination=destination,
                                                   date=formatted_date, time=formatted_time)
                 bookings_list = [booking for booking in bookings]
@@ -197,21 +200,17 @@ def checkseats(request):
                 if booked_seats <= 59:
                     return render(request, "app/booking.html",
                                   {'available_seats': 60 - booked_seats, "origin": origin,
-                                   'destination': destination, 'date': date, 'time': time})
+                                   'destination': destination, 'date': booking_date, 'time': booking_time})
             except Booking.DoesNotExist:
                 return render(request, "app/booking.html",
                               {'available_seats': 60, "origin": origin,
-                               'destination': destination, 'date': date, 'time': time})
+                               'destination': destination, 'date': booking_date, 'time': booking_time})
         return render(request, 'app/booking.html', {'routes': routes, 'booking_warning': 'Missing fields detected'})
     return redirect('booking')
 
 
 today = date.today()
 future = today + timedelta(weeks=1)
-
-
-# str_today = date.strftime(today, "%d-%m-%Y")
-# str_future = date.strftime(future, "%d-%m-%Y")
 
 
 # the booking page view
@@ -224,20 +223,21 @@ def booking_view(request):
         name = request.user.first_name + " " + request.user.last_name
         origin = request.POST['origin']
         destination = request.POST['destination']
-        date = request.POST['booking_date']
-        time = request.POST['booking_time']
+        booking_date = request.POST['booking_date']
+        booking_time = request.POST['booking_time']
         seats = request.POST['seats']
         phone = request.user.profile.phone
-        if origin and destination and time and date and seats:
+        if origin and destination and booking_time and booking_date and seats:
             try:
                 route = Route.objects.get(origin=origin, destination=destination)
                 amount = int(route.cost) * int(seats)
                 booking = Booking.objects.create(name=name, origin=origin, destination=destination,
-                                                 date=date, time=time, seats=seats, amount=amount)
+                                                 date=booking_date, time=booking_time, seats=seats, amount=amount)
                 booking_id = booking.id
                 return render(request, 'app/summary.html', {'name': name,
-                                                            'origin': origin, 'destination': destination, 'date': date,
-                                                            'time': time, 'seats': seats, 'amount': amount,
+                                                            'origin': origin, 'destination': destination,
+                                                            'date': booking_date,
+                                                            'time': booking_time, 'seats': seats, 'amount': amount,
                                                             'phone': phone,
                                                             'booking_id': booking_id})
             except Route.DoesNotExist:
@@ -249,8 +249,9 @@ def booking_view(request):
                                                     'destinations': routes['destinations'], 'booking_warning':
                                                         'Missing fields detected', 'min_date': today,
                                                     'max_date': future})
-    return render(request, 'app/booking.html', {'origins': routes['origins'], 'destinations': routes['destinations']
-        , 'min_date': str(today), 'max_date': str(future)})
+    return render(request, 'app/booking.html', {'origins': routes['origins'],
+                                                'min_date': str(today), 'max_date': str(future)})
+
 
 # the payment page view
 @loginRequired
@@ -272,8 +273,9 @@ def summary(request):
 
 def payment_view(request, booking_id):
     booking = Booking.objects.get(id=booking_id)
-    phone= request.user.profile.phone
-    return render(request, 'app/payment.html',{'booking': booking,'paybill':LipanaMpesaPassword.Business_short_code,'phone':phone})
+    phone = request.user.profile.phone
+    return render(request, 'app/payment.html',
+                  {'booking': booking, 'paybill': LipanaMpesaPassword.Business_short_code, 'phone': phone})
 
 
 # function to check if the entered phone number is correct
@@ -332,4 +334,17 @@ def delete_booking(request):
             booking.delete()
             return redirect('home')
 
+
+@csrf_exempt
+def get_destinations(request):
+    if request.is_ajax():
+        origin = request.POST['origin']
+        routes = Route.objects.filter(origin=origin)
+        destinations = [route.destination for route in routes]
+        return JsonResponse({'destinations': destinations})
+    raise Http404("Request is not ajax")
+
+
+def check_seats(request):
+    pass
 

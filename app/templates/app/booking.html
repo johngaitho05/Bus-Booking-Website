@@ -1,78 +1,34 @@
 {% extends 'app/base.html' %}
-{#{% block navbar %}#}
-{#    <ul class="nav navbar-nav navbar-left" id="top-menu">#}
-{#        <li><a href="{% url 'home' %}" class="scroll">Home</a></li>#}
-{#        <li><a href="#about" class="scroll">About us</a></li>#}
-{#        <li><a href="#destinations" class="scroll">Destinations</a></li>#}
-{#        <li><a href="#services" class="scroll">Services</a></li>#}
-{#        <li><a href="#contact" class="scroll">Contact</a></li>#}
-{#        <li class="active"><a href="#booking">Booking</a></li>#}
-{#    </ul>#}
-{#{% endblock %}#}
-
+{% load static %}
 {% block homecontent %}
-    <div class="col-md-6 col-md-offset-3">
-        <div class="jumbotron" id="booking_container">
-            <h3 CLASS='text-center'>BOOKING FORM</h3>
-            <p style="color:red;font-size:15px">{{ booking_warning }}</p>
-            {% if available_seats %}
-                <form id="booking_form" action="{% url 'booking' %}" method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group ">
-                                <label for="origin" class="control-label">Origin</label>
-                                <select class="form-control" name='origin' id='origin' readonly="">
-                                    <Option>{{origin}}</Option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group ">
-                                <label for="destination" class="control-label">Destination</label>
-                                <select class="form-control" name="destination" id='destination' readonly="">
-                                    <Option>{{destination}}</Option>
-                                </select>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/jquery.seat-charts.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/bootstrap-theme.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/bootstrap-theme.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/lib/booking.css' %}">
+    <script src="{% static 'js/lib/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery.seat-charts.js' %}"></script>
+    <script src="{% static 'js/lib/bootstrap.js' %}"></script>
+    <script src="{% static 'js/lib/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/lib/angular.min.js' %}"></script>
+    <script src="{% static 'js/lib/booking.js' %}"></script>
+    <div id="booking_view">
+        <div class="col-md-6 col-md-offset-3" id="booking-form-view">
+            <div class="jumbotron" id="booking_container">
+                <h3 CLASS='text-center'>BOOKING FORM</h3>
+                <br/>
+                <p style="color:red;font-size:15px" id="booking-warning"></p>
 
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group ">
-                                <label for="booking_date">Date</label>
-                                <input type="date" id='booking_date' name='booking_date' value="{{ date }}" class='form-control' readonly/>
-
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group ">
-                                <label for="booking_date">Time</label>
-                                <select class="form-control" name="booking_time" id='booking_time' readonly="">
-                                    <Option>{{time}}</Option>
-                                </select>
-
-                            </div>
-                        </div>
-                        <div class="col-md-12 ">
-                            <div class='form-group'>
-                                <label for="seats" style='display:inline !important'>Number of seats</label>
-                                <input type="number" max="{{available_seats}}" min="1" class="form-control" id='seats' name='seats' style='display: inline !important; width:50%'/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" class='btn btn-primary' id='booking_submit' value="Proceed"/>
-                        </div>
-                    </div>
-                </form>
-            {% else %}
                 <form id="booking_form" action="{% url 'check_seats' %}" method="post">
                     {% csrf_token %}
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="origin" class="control-label">Origin</label>
-                            <select class="form-control" name='origin' id='origin'>
+                            <select class="form-control" name='origin' id='origin' onchange="refresh_destinations()" required>
                                 <Option value="">Select</Option>
                                 {% for origin in origins %}
-                                    <Option>{{origin}}</Option>
+                                    <Option value="{{ origin }}">{{origin}}</Option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -80,12 +36,8 @@
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="destination" class="control-label">Destination</label>
-                            <select class="form-control" name="destination" id='destination'>
+                            <select class="form-control" name="destination" id='destination' required>
                                 <Option value="">Select</Option>
-                                {% for destination in destinations %}
-                                    <Option>{{destination}}</Option>
-                                {% endfor %}
-
                             </select>
 
                         </div>
@@ -93,59 +45,43 @@
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="booking_date">Date</label>
-                            <input type="date" min="{{min_date}}" max={{ max_date }} id='booking_date' name='booking_date' class='form-control'/>
+                            <input type="date" min="{{min_date}}" max={{ max_date }} id='booking_date' name='booking_date' class='form-control' required/>
 
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="booking_date">Time</label>
-                            <select class="form-control" name="booking_time" id='booking_time'>
-                                <Option>Select</Option>
-                                <Option>00:00</Option>
-                                <Option>01:00</Option>
-                                <Option>02:00</Option>
-                                <Option>03:00</Option>
-                                <Option>04:00</Option>
-                                <Option>05:00</Option>
-                                <Option>06:00</Option>
-                                <Option>07:00</Option>
-                                <Option>08:00</Option>
-                                <Option>09:00</Option>
-                                <Option>10:00</Option>
-                                <Option>11:00</Option>
-                                <Option>12:00</Option>
-                                <Option>13:00</Option>
-                                <Option>14:00</Option>
-                                <Option>15:00</Option>
-                                <Option>16:00</Option>
-                                <Option>17:00</Option>
-                                <Option>18:00</Option>
-                                <Option>19:00</Option>
-                                <Option>20:00</Option>
-                                <Option>21:00</Option>
-                                <Option>22:00</Option>
-                                <Option>23:00</Option>
+                            <select class="form-control" name="booking_time" id='booking_time' required>
                             </select>
 
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="submit" class='btn btn-primary' id='booking_submit' value="Check available seats"/>
+                        <input type="button" class='btn btn-primary' id='booking_submit' onclick="check_seats()" value="Check available seats"/>
                     </div>
                 </form>
-            {% endif %}
+            </div>
         </div>
-    </div>
-    "{% if available_seats %}"
-    <div class="col-md-3">
-        <div id="available_seats">
-            <h4>Available seats: {{ available_seats }}</h4>
-        </div>
-    </div>
-{% endif %}
+        <div id="seats-view" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3 seat-panel-wrapper" hidden>
+            <div id="seat-map" class="seat-panel">
+                <div class="front-indicator">Front</div>
 
+            </div>
+            <div class="booking-details">
+                <div id="legend">
+                    <h3>Key</h3>
+                </div>
+                <h3> Selected Seats (<span id="counter">0</span>):</h3>
+                <ul id="selected-seats"></ul>
+
+                Total: <b>KES<span id="total">0</span></b>
+
+                <button onclick="check_out()" class="checkout-button">Checkout &raquo;</button>
+
+            </div>
+        </div>
+    </div>
 {% endblock %}
-
 
 

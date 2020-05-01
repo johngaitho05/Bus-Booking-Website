@@ -9,10 +9,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href=" {% static 'css/bootstrap.css'%} " />
+    <link rel="stylesheet" href=" {% static 'css/bootstrap.css'%} "/>
+    <link rel="stylesheet" href=" {% static 'css/bootstrap-theme.css'%} "/>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/booking.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.seat-charts.css' %}">
     <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+
 </head>
 <body id="body">
 
@@ -434,6 +438,7 @@
         </div>
     </div>
 </div>
+<div class="modal loader"></div>
 {#<iframe src="https://ramabot.chat/v2/link.html?id=b191a09b-245b-48a0-8c66-5a4d58e30898"  width="100%" height="600" frameBorder="0"></iframe>#}
 <!-- SCRIPTS -->
 <script src="{% static 'js/jquery.js' %}"></script>
@@ -441,11 +446,107 @@
 <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
-<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.js"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+<script src="{% static 'js/jquery.seat-charts.js' %}"></script>
+<script src="{% static 'js/angular.min.js' %}"></script>
 
 <script type="text/javascript">
+    let firstSeatLabel = 1;
+    let selected_seats = new Set();
     $(document).ready(function(){
+        setTimeSelector();
+        const $cart = $('#selected-seats'),
+            $counter = $('#counter'),
+            $total = $('#total'),
+            sc = $('#seat-map').seatCharts({
+                map: [
+                    'ff___',
+                    'ff_ff',
+                    '___ee',
+                    'ee_ee',
+                    'ee_ee',
+                    'ee_ee',
+                    'ee_ee',
+                    'eeeee',
+                ],
+                seats: {
+                    f: {
+                        price: 800,
+                        classes: 'first-class', //your custom CSS class
+                        category: 'First Class'
+                    },
+                    e: {
+                        price: 700,
+                        classes: 'economy-class', //your custom CSS class
+                        category: 'Economy Class'
+                    }
+
+                },
+                naming: {
+                    top: false,
+                    getLabel: function (character, row, column) {
+                        return firstSeatLabel++;
+                    },
+                },
+                legend: {
+                    node: $('#legend'),
+                    items: [
+                        ['f', 'available', 'First Class'],
+                        ['e', 'available', 'Economy Class'],
+                        ['f', 'unavailable', 'Already Booked']
+                    ]
+                },
+                click: function () {
+                    if (this.status() === 'available') {
+                        //let's create a new <li> which we'll add to the cart items
+                        $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>KES' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
+                            .attr('id', 'cart-item-' + this.settings.id)
+                            .data('seatId', this.settings.id)
+                            .appendTo($cart);
+
+                        /*
+                         * Lets update the counter and total
+                         *
+                         * .find function will not find the current seat, because it will change its stauts only after return
+                         * 'selected'. This is why we have to add 1 to the length and the current seat price to the total.
+                         */
+                        $counter.text(sc.find('selected').length + 1);
+                        $total.text(recalculateTotal(sc) + this.data().price);
+                        selected_seats.add(this.settings.label);
+                        console.log(selected_seats);
+                        return 'selected';
+                    } else if (this.status() === 'selected') {
+                        //update the counter
+                        $counter.text(sc.find('selected').length - 1);
+                        //and total
+                        $total.text(recalculateTotal(sc) - this.data().price);
+
+                        //remove the item from our cart
+                        $('#cart-item-' + this.settings.id).remove();
+
+                        //seat has been vacated
+                        selected_seats.delete(this.settings.label);
+                        console.log(selected_seats);
+                        return 'available';
+                    } else if (this.status() === 'unavailable') {
+                        //seat has been already booked
+                        return 'unavailable';
+                    } else {
+                        return this.style();
+                    }
+                }
+            });
+
+        //this will handle "[cancel]" link clicks
+        $('#selected-seats').on('click', '.cancel-cart-item', function () {
+            //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
+            sc.get($(this).parents('li:first').data('seatId')).click();
+        });
+
+        //let's pretend some seats have already been booked
+        {#sc.get(['1_2', '4_1', '7_1', '8_2']).status('unavailable');#}
+
+
         {% if view and view == 'login' %}
             $('#loginModal').modal('show');
             {% if login_warning %}
@@ -463,107 +564,36 @@
             document.getElementById("passnav").style.width = "60%";
         {% endif %}
     });
-    $('#btnLoginModal').click(function(){
+    $('#btnLoginModal').click(function() {
 
         $('#loginModal').modal('show');
 
-        $('#login_button').click(function(){
+        $('#login_button').click(function () {
             document.getElementById('loginForm').submit();
         });
         {% if alert_message %}
             alert("{{ alert_message }}");
         {% endif %}
     });
-    function openProfNav(){
-        document.getElementById("reservationnav").style.width = "0";
-        document.getElementById("passnav").style.width = "0%";
-        document.getElementById("profilenav").style.width = "60%";
-    }
-    function openPassNav(){
-        document.getElementById("reservationnav").style.width = "0";
-        document.getElementById("profilenav").style.width = "0%";
-        document.getElementById("passnav").style.width = "60%";
-    }
-    function openReservationsNav(){
-        document.getElementById("profilenav").style.width = "0%";
-        document.getElementById("passnav").style.width = "0%";
-        document.getElementById("reservationnav").style.width = "60%";
-    }
-    function openNav() {
-        document.getElementById("mySidenav").style.width = "20%";
-    }
 
-    /* Set the width of the side navigation to 0 */
-    function closeNav() {
-        document.getElementById("mySidenav").style.width = "0";
-        document.getElementById("profilenav").style.width = "0%";
-        document.getElementById("passnav").style.width = "0%";
-        document.getElementById("reservationnav").style.width = "0";
-    }
+    $body = $("body");
 
-    function closeNavsByExit() {
-        var allnavs = document.getElementsByClassName('detailedsidenav');
-        for(var i = 0; i < allnavs.length; i++){
-            allnavs[i].style.width = '0';
-        }
-    }
-
-    $('#home').hover(function () {
-        closeNavsByExit();
+    $(document).on({
+        ajaxStart: function() { $body.addClass("loading");    },
+        ajaxStop: function() { $body.removeClass("loading"); }
     });
-    $('.nav').hover(function () {
-        closeNavsByExit();
-    });
+    function recalculateTotal(sc) {
+        let total = 0;
 
-</script>
-<script type="text/javascript">
-    let lastId,
-        topMenu = $("#top-menu"),
-        topMenuHeight = topMenu.outerHeight() + 15,
-        // All list items
-        menuItems = topMenu.find("a"),
-        // Anchors corresponding to menu items
-        scrollItems = menuItems.map(function () {
-            var item = $($(this).attr("href"));
-            if (item.length) {
-                return item;
-            }
+        //basically find every selected seat and sum its price
+        sc.find('selected').each(function () {
+            total += this.data().price;
         });
 
-    // Bind click handler to menu items
-    // so we can get a fancy scroll animation
-    menuItems.click(function(e){
-        const href = $(this).attr("href"),
-            offsetTop = href === "#" ? 0 : $(href).offset().top - topMenuHeight + 1;
-        $('html, body').stop().animate({
-            scrollTop: offsetTop
-        }, 800);
-        e.preventDefault();
-    });
-
-    // Bind to scroll
-    $(window).scroll(function(){
-        // Get container scroll position
-        const fromTop = $(this).scrollTop() + topMenuHeight;
-
-        // Get id of current scroll item
-        let cur = scrollItems.map(function () {
-            if ($(this).offset().top < fromTop)
-                return this;
-        });
-        // Get the id of the current element
-        cur = cur[cur.length-1];
-        const id = cur && cur.length ? cur[0].id : "";
-
-        if (lastId !== id) {
-            lastId = id;
-            // Set/remove active class
-            menuItems
-                .parent().removeClass("active")
-                .end().filter("[href='#"+id+"']").parent().addClass("active");
-        }
-    });
+        return total;
+    }
 </script>
+
 {#<script async>#}
 {#    (function(w, d) {#}
 {#        w['rama-bot'] = {"id":"b191a09b-245b-48a0-8c66-5a4d58e30898"};#}
