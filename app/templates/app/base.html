@@ -57,7 +57,7 @@
             <ul class="nav navbar-nav navbar-right" >
                 {% if user.is_authenticated %}
                     <li id="user_id">
-                        <a href="#" onclick="openNav()">{{user.username}}</a>
+                        <a href="javascript:{openPrimarySideNav()}">{{user.email}}</a>
                     </li>
                 {% else %}
 
@@ -70,10 +70,10 @@
     </div>
 </section>
 <div id="mySidenav" class="sidenav" data-backdrop=''>
-    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#"  onclick="openProfNav()"><i class="fas fa-angle-left arrow"></i> My Account</a>
-    <a href="#"  onclick="openPassNav()"><i class="fas fa-angle-left arrow"></i> Change Password</a>
-    <a href="#"  onclick="openReservationsNav()"><i class="fas fa-angle-left arrow"></i> My reservations</a>
+    <a href="javascript:{closeAll()}" class="closebtn">&times;</a>
+    <a href="javascript:{openDetailedSideNav(0)}"><i class="fas fa-angle-left arrow"></i> My Account</a>
+    <a href="javascript:{openDetailedSideNav(2)}"><i class="fas fa-angle-left arrow"></i> My reservations</a>
+    <a href="javascript:{openDetailedSideNav(1)}"><i class="fas fa-angle-left arrow"></i> Change Password</a>
     <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
     <form id="logout_form" method="post" action="{% url 'logout' %}">
         {% csrf_token %}
@@ -159,10 +159,47 @@
 {#User Reservations sidenav#}
 <div id="reservationnav" class="detailedsidenav sidenav" data-backdrop=''>
     <div class="row">
-        <div class="col-lg-6 col-lg-offset-3">
-            {% if reservations %}
+        <div class="col-lg-12" style="margin:0 10px !important;">
+            {% if bookings %}
+                <p>Note that reservation get discarded if payment is not received within 30 minutes</p>
+                <h3 class="text-center">Your Reservations</h3>
+                <table class="table table-bordered table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Booking Id</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Travelling Date</th>
+                        <th>Seat(s) No.</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <th>{{booking.pk}}</th>
+                            <th>{{ booking.route.origin }}</th>
+                            <th>{{ booking.route.destination }}</th>
+                            <th>{{booking.travelling_datetime}}</th>
+                            <th>{{booking.seats}}</th>
+                            <th>{{booking.amount}}</th>
+                            {% if booking.paid %}
+                                <th>Paid</th>
+                            {% else %}
+                                <th>Pending payment<a class="text-center" href="javascript:{document.getElementById('pay-{{ booking.id }}').submit();}" >Pay Now</a></th>
+                            {% endif %}
+                        </tr>
+                        <form id="pay-{{ booking.id }}" action="{% url 'summary' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}"/>
+                        </form>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% else %}
-                <h3>You haven't made any reservation</h3>
+                <h3 class="text-center">You haven't made any reservation</h3>
             {% endif %}
         </div>
     </div>
@@ -451,101 +488,8 @@
 <script src="{% static 'js/angular.min.js' %}"></script>
 
 <script type="text/javascript">
-    let firstSeatLabel = 1;
-    let selected_seats = new Set();
     $(document).ready(function(){
         setTimeSelector();
-        const $cart = $('#selected-seats'),
-            $counter = $('#counter'),
-            $total = $('#total'),
-            sc = $('#seat-map').seatCharts({
-                map: [
-                    'ff___',
-                    'ff_ff',
-                    '___ee',
-                    'ee_ee',
-                    'ee_ee',
-                    'ee_ee',
-                    'ee_ee',
-                    'eeeee',
-                ],
-                seats: {
-                    f: {
-                        price: 800,
-                        classes: 'first-class', //your custom CSS class
-                        category: 'First Class'
-                    },
-                    e: {
-                        price: 700,
-                        classes: 'economy-class', //your custom CSS class
-                        category: 'Economy Class'
-                    }
-
-                },
-                naming: {
-                    top: false,
-                    getLabel: function (character, row, column) {
-                        return firstSeatLabel++;
-                    },
-                },
-                legend: {
-                    node: $('#legend'),
-                    items: [
-                        ['f', 'available', 'First Class'],
-                        ['e', 'available', 'Economy Class'],
-                        ['f', 'unavailable', 'Already Booked']
-                    ]
-                },
-                click: function () {
-                    if (this.status() === 'available') {
-                        //let's create a new <li> which we'll add to the cart items
-                        $('<li>' + this.data().category + ' Seat # ' + this.settings.label + ': <b>KES' + this.data().price + '</b> <a href="#" class="cancel-cart-item">[cancel]</a></li>')
-                            .attr('id', 'cart-item-' + this.settings.id)
-                            .data('seatId', this.settings.id)
-                            .appendTo($cart);
-
-                        /*
-                         * Lets update the counter and total
-                         *
-                         * .find function will not find the current seat, because it will change its stauts only after return
-                         * 'selected'. This is why we have to add 1 to the length and the current seat price to the total.
-                         */
-                        $counter.text(sc.find('selected').length + 1);
-                        $total.text(recalculateTotal(sc) + this.data().price);
-                        selected_seats.add(this.settings.label);
-                        console.log(selected_seats);
-                        return 'selected';
-                    } else if (this.status() === 'selected') {
-                        //update the counter
-                        $counter.text(sc.find('selected').length - 1);
-                        //and total
-                        $total.text(recalculateTotal(sc) - this.data().price);
-
-                        //remove the item from our cart
-                        $('#cart-item-' + this.settings.id).remove();
-
-                        //seat has been vacated
-                        selected_seats.delete(this.settings.label);
-                        console.log(selected_seats);
-                        return 'available';
-                    } else if (this.status() === 'unavailable') {
-                        //seat has been already booked
-                        return 'unavailable';
-                    } else {
-                        return this.style();
-                    }
-                }
-            });
-
-        //this will handle "[cancel]" link clicks
-        $('#selected-seats').on('click', '.cancel-cart-item', function () {
-            //let's just trigger Click event on the appropriate seat, so we don't have to repeat the logic here
-            sc.get($(this).parents('li:first').data('seatId')).click();
-        });
-
-        //let's pretend some seats have already been booked
-        {#sc.get(['1_2', '4_1', '7_1', '8_2']).status('unavailable');#}
-
 
         {% if view and view == 'login' %}
             $('#loginModal').modal('show');
@@ -593,7 +537,6 @@
         return total;
     }
 </script>
-
 {#<script async>#}
 {#    (function(w, d) {#}
 {#        w['rama-bot'] = {"id":"b191a09b-245b-48a0-8c66-5a4d58e30898"};#}

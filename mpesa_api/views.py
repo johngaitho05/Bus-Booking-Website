@@ -20,10 +20,10 @@ def register_urls(request):
     access_token = MpesaAccessToken.validated_mpesa_access_token
     api_url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl"
     headers = {"Authorization": "Bearer %s" % access_token}
-    options = {"ShortCode": "600220",
+    options = {"ShortCode": "601481",
                "ResponseType": "Completed",
-               "ConfirmationURL": "https://efce4a14.ngrok.io/api/c2b/confirmation",
-               "ValidationURL": "https://efce4a14.ngrok.io/api/c2b/validation"}
+               "ConfirmationURL": "https://a944b093.ngrok.io/c2b/confirmation",
+               "ValidationURL": "https://a944b093.ngrok.io/c2b/validation"}
     response = requests.post(api_url, json=options, headers=headers)
     return HttpResponse(response.text)
 
@@ -93,7 +93,8 @@ def confirmation(request):
         type=mpesa_payment['TransactionType'],
     )
     payment.save()
-    booking = Booking.objects.get(id=int(mpesa_payment['BillRefNumber']))
+    acc = mpesa_payment['BillRefNumber']
+    booking = Booking.objects.get(id=int(formatted_account_number(acc)))
     booking.paid = True
     booking.save()
 
@@ -101,24 +102,23 @@ def confirmation(request):
 @loginRequired
 def simulate_payment(request):
     if request.method == 'POST':
-        phone = int(request.POST['phone'])
         amount = int(request.POST['amount'])
-        account_number = request.POST['account_number']
+        raw_acc = int(request.POST['account_number'])
         access_token = MpesaAccessToken.validated_mpesa_access_token
         api_url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate"
         headers = {"Authorization": "Bearer %s" % access_token}
-        request = {"ShortCode": "600220",
+        request = {"ShortCode": "601481",
                    "CommandID": "CustomerPayBillOnline",
                    "Amount": amount,
                    "Msisdn": 254708374149,
-                   "BillRefNumber": account_number}
+                   "BillRefNumber": formatted_account_number(raw_acc)}
 
         requests.post(api_url, json=request, headers=headers)
-        countdown = 10
-        while countdown > 0:
-            time.sleep(1)
-            countdown -= 1
-        booking = Booking.objects.get(id=int(account_number))
+        # countdown = 10
+        # while countdown > 0:
+        #     time.sleep(1)
+        #     countdown -= 1
+        booking = Booking.objects.get(id=raw_acc)
         if booking.paid is True:
             return HttpResponse("payment received")
         return HttpResponse("payment has not been received!")
@@ -135,3 +135,20 @@ def result_view(request):
 def timeout_view(request):
     mpesa_body = request.body.decode('utf-8')
     return HttpResponse(mpesa_body)
+
+
+def formatted_account_number(num):
+    if type(num) == int:
+        if num > 10:
+            return 'B00' + str(num)
+        elif num < 100:
+            return 'B0' + str(num)
+        else:
+            return 'B' + str(num)
+
+    elif type(num) == str:
+        for i in range(len(num)):
+            if num[i] != 'B' and num[i] != '0':
+                return num[i:]
+
+    return '-1'

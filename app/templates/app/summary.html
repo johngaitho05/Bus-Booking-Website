@@ -11,9 +11,18 @@
     <link rel="stylesheet" href=" {% static 'css/bootstrap.css' %} " />
     <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/booking.css' %}">
 </head>
-<body>
+<body id="body">
+
+<!-- PRE LOADER -->
+<section class="preloader">
+    <div class="spinner">
+        <span class="spinner-rotate"></span>
+    </div>
+</section>
+
 <div class="container">
     <div class="row">
         <div class="navbar custom-navbar navbar-fixed-top">
@@ -29,15 +38,6 @@
                     <!-- lOGO TEXT HERE -->
                     <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
                 </div>
-
-                <!-- MENU LINKS -->
-{#                <div class="collapse navbar-collapse text-center">#}
-{##}
-{#                    <ul class="nav navbar-nav navbar-right ">#}
-{#                        <li><a href="#" id="user_id" onclick="openNav()">{{user.username}}</a></li>#}
-{#                    </ul>#}
-{#                </div>#}
-
             </div>
         </div>
     </div>
@@ -61,20 +61,20 @@
             <th>Destination</th>
             <th>Travelling Date</th>
             <th>Departure Time</th>
-            <th>No of seats</th>
+            <th>Seat Number</th>
             <th>Amount</th>
 
         </tr>
         </thead>
         <tbody>
         <tr class="active">
-            <td>{{ name }}</td>
-            <td>{{origin}}</td>
-            <td>{{destination}}</td>
-            <td>{{date}}</td>
-            <td>{{time}}</td>
-            <td>{{seats}}</td>
-            <td>Ksh {{amount}}</td>
+            <td>{{ user.first_name }} {{ user.last_name }}</td>
+            <td>{{booking.route.origin}}</td>
+            <td>{{booking.route.destination}}</td>
+            <td>{{booking.travelling_datetime.date}}</td>
+            <td>{{booking.travelling_datetime.time}}</td>
+            <td>{{booking.seats}}</td>
+            <td>Ksh {{booking.amount}}</td>
         </tr>
         </tbody>
     </table>
@@ -88,21 +88,18 @@
                 {% csrf_token %}
                 <div class="input-group">
                     <div class="input-group-addon">Mpesa Number:</div>
-                    <input type="text" id='mpesa_number' name='mpesa_number' value="{{phone}}" class="form-control" style="max-width: 200px"/>
+                    <input type="text" id='mpesa_number' name='mpesa_number' value="{{user.profile.phone}}" class="form-control" style="max-width: 200px"/>
                 </div>
-{#                <input type="hidden" name='date' value="{{ date }}" />#}
-{#                <input type="hidden" name='time' value="{{ time }}" />#}
-{#                <input type="hidden" name='origin' value="{{ origin }}"/>#}
-{#                <input type="hidden" name='destination' value="{{ destination }}"/>#}
-                <input type="hidden" name='amount' value="{{ amount }}"/>
-                <input type="hidden"  name="booking_id" value='{{ booking_id }}'/>
+                <input type="hidden" name='amount' value="{{ booking.amount }}"/>
+                <input type="hidden"  name="booking_id" value='{{ booking.id }}'/>
 
             </form>
             <br>
-            <h2>Payment mode: Mpesa</h2>
+            <h4>Payment mode: Mpesa</h4>
+            <img src="{% st %}"/>
         </div>
         <div class="col-md-3">
-            <h3>Amount: <span style="color:rgb(255, 87, 51);padding-left: 10px">Ksh {{ amount }}</span></h3>
+            <h3>Amount: <span style="color:rgb(255, 87, 51);padding-left: 10px">Ksh {{ booking.amount }}</span></h3>
         </div>
         <div class="col-md-3">
             <br>
@@ -111,21 +108,7 @@
 
     </div>
 </div>
-{#<div id="mySidenav" class="sidenav" data-backdrop=''>#}
-{#    <a href="#" class="closebtn" onclick="closeNav()">&times;</a>#}
-{#    <a href="#">Account<i class="fas fa-angle-right arrow"></i></a>#}
-{#    <a href="#">My reservations <i class="fas fa-angle-right arrow"></i></a>#}
-{#    <a href="#">Change password<i class="fas fa-angle-right arrow"></i></a>#}
-{#    <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>#}
-{#    <form id="logout_form" method="post" action="{% url 'logout' %}">#}
-{#        {% csrf_token %}#}
-{#        <input type="hidden"/>#}
-{#    </form>#}
-{#    <form id="delete_booking_form" method="post" action="{% url 'delete_booking' %}">#}
-{#        {% csrf_token %}#}
-{#        <input type="hidden" id="booking_id" name="booking_id" value='{{ booking_id }}'/>#}
-{#    </form>#}
-{#</div>#}
+
 </body>
 <!-- SCRIPTS -->
 <script src="{% static 'js/jquery.js' %}"></script>
@@ -137,26 +120,6 @@
 <script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 <script>
-{#    $(document).ready(function(){#}
-{#   let form = document.getElementById('delete_booking_form');#}
-{#   form.submit(function(){#}
-{#      $.post($(this).attr('action'), $(this).serialize(), function(response){#}
-{#            // do something here on success#}
-{#      },'json');#}
-{#      return false;#}
-{#   });#}
-{#        form.submit();#}
-{#    });#}
-{#    /* Set the width of the side navigation to 300px */#}
-{#    function openNav() {#}
-{#        document.getElementById("mySidenav").style.width = "300px";#}
-{#        document.getElementById("mySidenav").style.background = '#eaecee';#}
-{#    }#}
-{##}
-{#    /* Set the width of the side navigation to 0 */#}
-{#    function closeNav() {#}
-{#        document.getElementById("mySidenav").style.width = "0";#}
-{#    }#}
     $('#pay').click(function(){
         document.getElementById('payment_form').submit();
     });

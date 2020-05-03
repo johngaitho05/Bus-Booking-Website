@@ -20,8 +20,7 @@
                 <br/>
                 <p style="color:red;font-size:15px" id="booking-warning"></p>
 
-                <form id="booking_form" action="{% url 'check_seats' %}" method="post">
-                    {% csrf_token %}
+                <form id="booking_form">
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="origin" class="control-label">Origin</label>
@@ -69,6 +68,7 @@
 
             </div>
             <div class="booking-details">
+
                 <div id="legend">
                     <h3>Key</h3>
                 </div>
@@ -80,6 +80,12 @@
                 <button onclick="check_out()" class="checkout-button">Checkout &raquo;</button>
 
             </div>
+            <form id="summary-view-form" method="post" action="{% url 'summary' %}">
+                {% csrf_token %}
+                <input type="hidden" value="0" id="f-cost"/>
+                <input type="hidden" value="0" id="e-cost"/>
+                <input type="hidden" name="booking_id" id="booking_id"/>
+            </form>
         </div>
     </div>
 {% endblock %}

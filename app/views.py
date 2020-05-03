@@ -1,8 +1,12 @@
 from datetime import datetime, date, time, timedelta
 import time
+
+import pytz
 from django.http.response import JsonResponse, Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.utils import timezone
+from django.utils.timezone import make_aware
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Profile, Route, Booking
@@ -137,6 +141,7 @@ def update_user(request):
         else:
             return render(request, 'app/index.html',
                           {'view': 'user_profile', 'warning': 'Please fill in the missing fields'})
+    return redirect('home')
 
 
 # page for changing password
@@ -144,14 +149,14 @@ def update_user(request):
 def update_password(request):
     if request.method == 'POST':
         username = request.user.username
-        oldpass = request.POST['old_password']
-        newpass1 = request.POST['new_password1']
-        newpass2 = request.POST['new_password2']
-        if oldpass and newpass1 and newpass2:
-            if newpass1 == newpass2:
-                user = authenticate(username=username, password=oldpass)
+        old_pass = request.POST['old_password']
+        new_pass1 = request.POST['new_password1']
+        new_pass2 = request.POST['new_password2']
+        if old_pass and new_pass1 and new_pass2:
+            if new_pass1 == new_pass2:
+                user = authenticate(username=username, password=old_pass)
                 if user is not None:
-                    user.set_password(newpass1)
+                    user.set_password(new_pass1)
                     user.save()
                     logout(request)
                     return render(request, 'app/index.html',
@@ -173,102 +178,50 @@ def update_password(request):
 
 # the homepage view
 def home_view(request):
-    return render(request, 'app/index.html', {'view': 'none'})
-
-
-# checking available seats
-@loginRequired
-def checkseats(request):
-    if request.method == 'POST':
-        origin = request.POST['origin']
-        destination = request.POST['destination']
-        booking_date = request.POST['booking_date']
-        booking_time = request.POST['booking_time']
-        routes = Route.objects.all()
-        if origin and destination and booking_time and booking_date:
-            try:
-                formatted_date = datetime.strptime(booking_date, "%Y-%m-%d")
-                formatted_time = datetime.strptime(booking_time + ':00', "%H:%M:%S")
-                bookings = Booking.objects.filter(origin=origin, destination=destination,
-                                                  date=formatted_date, time=formatted_time)
-                bookings_list = [booking for booking in bookings]
-                n = len(bookings_list) - 1
-                booked_seats = 0
-                while n >= 0:
-                    booked_seats += bookings_list[n].seats
-                    n -= 1
-                if booked_seats <= 59:
-                    return render(request, "app/booking.html",
-                                  {'available_seats': 60 - booked_seats, "origin": origin,
-                                   'destination': destination, 'date': booking_date, 'time': booking_time})
-            except Booking.DoesNotExist:
-                return render(request, "app/booking.html",
-                              {'available_seats': 60, "origin": origin,
-                               'destination': destination, 'date': booking_date, 'time': booking_time})
-        return render(request, 'app/booking.html', {'routes': routes, 'booking_warning': 'Missing fields detected'})
-    return redirect('booking')
-
-
-today = date.today()
-future = today + timedelta(weeks=1)
+    bookings = []
+    if request.user.is_authenticated:
+        bookings = Booking.objects.filter(user=request.user)
+    return render(request, 'app/index.html', {'view': 'none', 'bookings': bookings})
 
 
 # the booking page view
+@csrf_exempt
 def booking_view(request):
+    today = date.today()
+    future = today + timedelta(weeks=1)
+    bookings = Booking.objects.filter(user=request.user)
     if not request.user.is_authenticated:
         return render(request, 'app/index.html',
                       {'view': 'login', 'login_message': 'Please login to continue', 'where_to': 'booking'})
     routes = getroutes()
-    if request.method == 'POST':
-        name = request.user.first_name + " " + request.user.last_name
-        origin = request.POST['origin']
-        destination = request.POST['destination']
-        booking_date = request.POST['booking_date']
-        booking_time = request.POST['booking_time']
-        seats = request.POST['seats']
-        phone = request.user.profile.phone
-        if origin and destination and booking_time and booking_date and seats:
-            try:
-                route = Route.objects.get(origin=origin, destination=destination)
-                amount = int(route.cost) * int(seats)
-                booking = Booking.objects.create(name=name, origin=origin, destination=destination,
-                                                 date=booking_date, time=booking_time, seats=seats, amount=amount)
-                booking_id = booking.id
-                return render(request, 'app/summary.html', {'name': name,
-                                                            'origin': origin, 'destination': destination,
-                                                            'date': booking_date,
-                                                            'time': booking_time, 'seats': seats, 'amount': amount,
-                                                            'phone': phone,
-                                                            'booking_id': booking_id})
-            except Route.DoesNotExist:
-                return render(request, 'app/booking.html',
-                              {'routes': routes, 'booking_warning':
-                                  'None of our vehicles passes through that route. Try another route'
-                                  , 'min_date': today, 'max_date': future})
-        return render(request, 'app/booking.html', {'origins': routes['origins'],
-                                                    'destinations': routes['destinations'], 'booking_warning':
-                                                        'Missing fields detected', 'min_date': today,
-                                                    'max_date': future})
+    if request.is_ajax():
+        user = request.user
+        route = Route.objects.filter(id=request.POST['route_id']).first()
+        t_datetime = request.POST['datetime']
+        seats = make_seats_list(request.POST['seats'])
+        amount = request.POST['amount']
+        if route and t_datetime and seats:
+            booking = Booking.objects.create(user=user, route=route, travelling_datetime=t_datetime, seats=seats,
+                                             amount=amount)
+            data = {'booking_id': booking.id}
+            return JsonResponse(data)
+        else:
+            response = {'message': 'Something went wrong. Please try again'}
+            return JsonResponse(response)
+
     return render(request, 'app/booking.html', {'origins': routes['origins'],
-                                                'min_date': str(today), 'max_date': str(future)})
+                                                'min_date': str(today),
+                                                'max_date': str(future),
+                                                'bookings': bookings})
 
 
 # the payment page view
 @loginRequired
 def summary(request):
     if request.method == 'POST':
-        name = request.user.first_name + request.user.first_name
-        date = request.POST['date']
-        time = request.POST['time']
-        origin = request.POST['origin']
-        destination = request.POST['destination']
-        amount = request.POST['amount']
-        if name and date and time and origin and destination and amount:
-            return render(request, 'app/summary.html',
-                          {'name': name, 'date': date, 'time': time, 'origin': origin, 'destination': destination,
-                           'amount': amount})
-        else:
-            return redirect('booking', {'message': 'Blank fields detected'})
+        booking = Booking.objects.filter(id=request.POST['booking_id']).first()
+        return render(request, 'app/summary.html', {'booking': booking})
+    return redirect('booking')
 
 
 def payment_view(request, booking_id):
@@ -322,19 +275,6 @@ def getroutes():
     return {"origins": [], 'destinations': []}
 
 
-@loginRequired
-def delete_booking(request):
-    if request.method == 'POST':
-        boom = 600
-        while boom > 0:
-            time.sleep(1)
-            boom -= 1
-        booking = Booking.objects.get(id=int(request.POST['booking_id']))
-        if booking.paid is False:
-            booking.delete()
-            return redirect('home')
-
-
 @csrf_exempt
 def get_destinations(request):
     if request.is_ajax():
@@ -342,9 +282,45 @@ def get_destinations(request):
         routes = Route.objects.filter(origin=origin)
         destinations = [route.destination for route in routes]
         return JsonResponse({'destinations': destinations})
-    raise Http404("Request is not ajax")
+    return redirect('home')
 
 
+@csrf_exempt
 def check_seats(request):
-    pass
+    if request.is_ajax():
+        delete_unpaid()
+        origin = request.POST['origin']
+        destination = request.POST['destination']
+        t_date = request.POST['date']
+        t_time = request.POST['time'] + ':00'
+        if origin and destination and origin and t_date and t_time:
+            t_datetime = make_aware((datetime.strptime(t_date + " " + t_time, "%Y-%m-%d %H:%M:%S")))
+            route = Route.objects.filter(origin=origin, destination=destination, active=True).first()
+            if route:
+                bookings = Booking.objects.filter(route=route, travelling_datetime=t_datetime)
+                bookings = [booking for booking in bookings]
+                booked_seats = []
+                for booking in bookings:
+                    booked_seats += booking.seats
+                return JsonResponse({'booked_seats': booked_seats,
+                                     'first_class': route.first_class_cost,
+                                     'economy': route.economy_class_cost,
+                                     'datetime': t_datetime,
+                                     'route_id': route.id,
+                                     })
+            return JsonResponse({'message': 'There are no scheduled journeys for the selected route'})
 
+        return JsonResponse({'message': 'Missing fields detected. Please fill in all required fields'})
+
+    return redirect('home')
+
+
+def make_seats_list(string):
+    seats = string.split(',')
+    seats.pop()
+    return [int(seat_id) for seat_id in seats]
+
+
+def delete_unpaid():
+    filter_datetime = timezone.now()-timezone.timedelta(minutes=30)
+    Booking.objects.filter(booking_datetime__lte=filter_datetime, paid=False).delete()

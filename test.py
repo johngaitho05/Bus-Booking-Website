@@ -1,6 +1,6 @@
-from django.utils import timezone
-
-print(timezone.now())
+# from django.utils import timezone
+#
+# print(timezone.now())
 
 
 

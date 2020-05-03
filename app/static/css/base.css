@@ -342,6 +342,15 @@ section {
   text-align: center;
   padding-right: 20px;
 }
+#reservationnav a{
+  padding:0;
+  font-size:14px;
+  color:#31708f;
+}
+#reservationnav a:hover{
+  color:#1E90FF;
+  text-decoration: underline !important;
+}
 #logout{
   line-height: 100px; color:#FF8C00;text-align:center;
 }
