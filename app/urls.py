@@ -11,7 +11,8 @@ urlpatterns = [
     path('booking/summary', views.summary, name='summary'),
     path('payment/<int:booking_id>', views.payment_view, name='payment'),
     path('change-password/', views.update_password, name='change_password'),
-    path('profile/', views.update_user, name='update_user'),
+    path('profile-update/', views.update_user, name='update_user'),
     path('booking/check-seats/', views.check_seats, name='check_seats'),
+    path('save-message/', views.save_message, name='save_message'),
 
 ]

@@ -61,7 +61,7 @@
                     </li>
                 {% else %}
 
-                    <li><a href="#" id="btnLoginModal" style="padding-left: 50px">Login</a></li>
+                    <li><a href="{% url 'login' %}"  style="padding-left: 50px">Login</a></li>
                     <li><a id="user_id" href="{%  url 'signup' %}">Register</a></li>
 
                 {% endif %}
@@ -70,10 +70,10 @@
     </div>
 </section>
 <div id="mySidenav" class="sidenav" data-backdrop=''>
-    <a href="javascript:{closeAll()}" class="closebtn">&times;</a>
+    <a href="javascript:{closePrimarySideNav()}" class="closebtn">&times;</a>
     <a href="javascript:{openDetailedSideNav(0)}"><i class="fas fa-angle-left arrow"></i> My Account</a>
-    <a href="javascript:{openDetailedSideNav(2)}"><i class="fas fa-angle-left arrow"></i> My reservations</a>
-    <a href="javascript:{openDetailedSideNav(1)}"><i class="fas fa-angle-left arrow"></i> Change Password</a>
+    <a href="javascript:{openDetailedSideNav(1)}"><i class="fas fa-angle-left arrow"></i> My reservations</a>
+    <a href="javascript:{openDetailedSideNav(2)}"><i class="fas fa-angle-left arrow"></i> Change Password</a>
     <a href="javascript:{document.getElementById('logout_form').submit();}" id="logout">LOGOUT</a>
     <form id="logout_form" method="post" action="{% url 'logout' %}">
         {% csrf_token %}
@@ -85,10 +85,10 @@
 <div id="profilenav" class="detailedsidenav sidenav" data-backdrop=''>
     <div class="row">
         <div class="col-xs-11 col-xs-offset-1">
-            <p class="warning">{{ warning }}</p>
+            <p class="feedback-banner" id="update-profile-feedback"></p>
             <h3 class="text-center">Account Details</h3><br/>
-            <form action="{% url 'update_user' %}" method="post">
-                {% csrf_token %}
+            <form  id="update-profile-form">
+                {#                {% csrf_token %}#}
                 <div class="row">
                     <div class="col-md-6 ">
                         <div class="form-group">
@@ -99,7 +99,7 @@
                     <div class="col-md-6 ">
                         <div class="form-group">
                             <label>Last Name Name</label><br/>
-                            <input Value ='{{ user.last_name }}' name="last_name"/>
+                            <input Value ='{{ user.last_name }}' name="last_name" id="last_name"/>
                         </div>
                     </div>
                 </div>
@@ -107,13 +107,13 @@
                     <div class="col-md-6 ">
                         <div class="form-group">
                             <label>Phone Number</label><br/>
-                            <input Value ='{{ user.profile.phone }}' name="phone"/>
+                            <input Value ='{{ user.profile.phone }}' name="phone" id="phone"/>
                         </div>
                     </div>
                     <div class="col-md-6 ">
                         <div class="form-group">
                             <label>Email </label><br/>
-                            <input Value ='{{ user.email }}' name="email"/>
+                            <input Value ='{{ user.email }}' name="email" id="email"/>
                         </div>
                     </div>
                 </div>
@@ -121,38 +121,13 @@
                 <div class="row">
                     <div class="col-md-4 col-md-offset-4 ">
                         <div class="form-group">
-                            <input type="submit" id="update" value="UPDATE" class="btn btn-warning type=form-control"/>
+                            <input type="button" onclick="updateProfile()" id="update" value="UPDATE" class="btn btn-warning type=form-control"/>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
 
-    </div>
-</div>
-
-{#Change password sidenav#}
-<div id="passnav" class="detailedsidenav sidenav" data-backdrop=''>
-    <div class="row">
-        <div class="col-lg-6 col-lg-offset-3">
-            <p class="warning">{{ warning }}</p>
-            <h3 >Change Password</h3><br/>
-            <form id="change_password_form" method="post" action="{% url 'change_password' %}" >
-                {% csrf_token %}
-                <div class="form-group">
-                    <input type="password" id="old_password" name="old_password" placeholder="Enter the current passworrd" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="new_password1" name="new_password1" placeholder="Type a new password" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="new_password2" name="new_password2" placeholder="Confirm the new password" class="form-control"/>
-                </div>
-                <div class="form-group">
-                    <input type="submit" id="update" value="SUBMIT" class="btn btn-danger type=form-control"/>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
@@ -161,8 +136,9 @@
     <div class="row">
         <div class="col-lg-12" style="margin:0 10px !important;">
             {% if bookings %}
-                <p>Note that reservation get discarded if payment is not received within 30 minutes</p>
-                <h3 class="text-center">Your Reservations</h3>
+
+                <h3 class="text-center">Reservations</h3>
+                <br/>
                 <table class="table table-bordered table-condensed">
                     <thead>
                     <tr>
@@ -183,7 +159,7 @@
                             <th>{{ booking.route.origin }}</th>
                             <th>{{ booking.route.destination }}</th>
                             <th>{{booking.travelling_datetime}}</th>
-                            <th>{{booking.seats}}</th>
+                            <th>{{booking.customized_seats}}</th>
                             <th>{{booking.amount}}</th>
                             {% if booking.paid %}
                                 <th>Paid</th>
@@ -192,20 +168,48 @@
                             {% endif %}
                         </tr>
                         <form id="pay-{{ booking.id }}" action="{% url 'summary' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="booking_id" value="{{ booking.id }}"/>
+                            {% csrf_token %}
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}"/>
                         </form>
                     {% endfor %}
                     </tbody>
                 </table>
+                <br/>
+                <p><span style="color:orangered">Note:</span> Reservation will be discarded if payment is not received within 30 minutes</p>
             {% else %}
                 <h3 class="text-center">You haven't made any reservation</h3>
             {% endif %}
         </div>
     </div>
 </div>
+
+{#Change password sidenav#}
+<div id="passnav" class="detailedsidenav sidenav" data-backdrop=''>
+    <div class="row">
+        <div class="col-lg-6 col-lg-offset-3">
+            <p class="feedback-banner" id="update-password-feedback"></p>
+            <h3 >Change Password</h3><br/>
+            <form id="change_password_form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="password" name="old_password" placeholder="Enter the current passworrd" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="new_password1" name="new_password1" placeholder="Type a new password" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="new_password2" name="new_password2" placeholder="Confirm the new password" class="form-control"/>
+                </div>
+                <div class="form-group">
+                    <input type="button" id="update" value="SUBMIT" onclick="changePassword()" class="btn btn-danger type=form-control"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- HOME -->
-<section id="home" data-stellar-background-ratio="0.5" onclick='closeNav()'>
+<section id="home" data-stellar-background-ratio="0.5" onclick='closePrimarySideNav()'>
     <div class="overlay"></div>
     <div class="container">
         <div class="row">
@@ -344,25 +348,30 @@
             <div class="col-md-8 col-sm-8">
 
                 <!-- CONTACT FORM HERE -->
-                <form id="contact-form" role="form" action="#" method="post">
+                <form id="contact-form">
+                    <p class="feedback-banner text-center" id="send-message-feedback"></p>
                     {% csrf_token %}
                     <div class="col-md-6 col-sm-12">
-                        <input type="text" class="form-control" placeholder="Full Name" id="full_name" name="full_name" required="">
+                        <label for="sender_name">Full name</label>
+                        <input type="text" class="form-control" placeholder="Your Name" id="sender_name" name="sender_name" required>
                     </div>
 
                     <div class="col-md-6 col-sm-12">
-                        <input type="email" class="form-control" placeholder="Your Email" id="email" name="email" required="">
+                        <label for="sender_email">Email</label>
+                        <input type="email" class="form-control" placeholder="Your Email" id="sender_email" name="sender_email" required>
                     </div>
 
                     <div class="col-xs-12">
-                        <input type="tel" class="form-control" placeholder="Subject" id="cf-number" name="ms-subject" required="">
+                        <label for="subject">Subject</label>
+                        <input type="text" class="form-control" placeholder="Subject" id="subject" name="subject" required>
                     </div>
                     <div class="col-md-12 col-sm-12">
-                        <textarea class="form-control" rows="6" placeholder="Message" id="message" name="cf-message" required=""></textarea>
+                        <label for="message">Message</label>
+                        <textarea class="form-control" rows="6" placeholder="Message" id="message" name="message" required></textarea>
                     </div>
 
                     <div class="col-md-4 col-sm-12 col-md-offset-4">
-                        <input type="submit" class="btn btn-success btn-lg" name="submit" value="Send Message">
+                        <input onclick="sendMessage()" type="button" class="btn btn-success btn-lg" id="send-message-btn" value="Send Message">
                     </div>
 
                 </form>
@@ -446,9 +455,8 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6 col-md-offset-3">
-                        <p id="login_warning" class="warning" >{{ warning }}</p>
-                        <p  id="login_message" class="message">{{ message }}</p>
-                        <form action="{% url 'login'  %}" id="loginForm" method="post">
+                        <p class="feedback-banner" id="login-feedback"></p>
+                        <form  id="loginForm">
                             {% csrf_token %}
                             <div class="form-group-lg">
                                 <label for="inputUsername">Email Address</label>
@@ -460,14 +468,14 @@
                             </div>
                             <div class="form-group-lg">
                                 <input type="hidden" value='{{ where_to }}' name="where_to"/>
-                                <input class="btn btn-default" id="login_button" type="submit" Value="LOGIN" />
+                                <input onclick="login()" class="btn btn-default" id="login_button" type="button" Value="LOGIN" />
                             </div>
                         </form>
                     </div>
                 </div>
 
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer text-center">
                 <button class="btn btn-default" data-dismiss="modal">Close</button>
                 <br/>
                 <a href="{% url 'signup' %} class=text-center">Register Now</a>
@@ -489,35 +497,13 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        setTimeSelector();
-
         {% if view and view == 'login' %}
             $('#loginModal').modal('show');
-            {% if login_warning %}
-                document.getElementById('login_warning').innerHTML = '{{ login_warning }}';
-            {% elif login_message %}
-                document.getElementById('login_message').innerHTML = '{{ login_message }}';
+            {% if login_message %}
+                renderFeedback('{{ login_message }}','login-feedback',0);
             {% endif %}
         {% endif %}
-        {% if view == 'user_profile'%}
-            document.getElementById("mySidenav").style.width = "20%";
-            document.getElementById("profilenav").style.width = "60%";
-        {% endif %}
-        {% if view == 'change_password'%}
-            document.getElementById("mySidenav").style.width = "20%";
-            document.getElementById("passnav").style.width = "60%";
-        {% endif %}
-    });
-    $('#btnLoginModal').click(function() {
-
-        $('#loginModal').modal('show');
-
-        $('#login_button').click(function () {
-            document.getElementById('loginForm').submit();
-        });
-        {% if alert_message %}
-            alert("{{ alert_message }}");
-        {% endif %}
+        setTimeSelector();
     });
 
     $body = $("body");
@@ -526,16 +512,6 @@
         ajaxStart: function() { $body.addClass("loading");    },
         ajaxStop: function() { $body.removeClass("loading"); }
     });
-    function recalculateTotal(sc) {
-        let total = 0;
-
-        //basically find every selected seat and sum its price
-        sc.find('selected').each(function () {
-            total += this.data().price;
-        });
-
-        return total;
-    }
 </script>
 {#<script async>#}
 {#    (function(w, d) {#}

@@ -33,3 +33,17 @@ class Booking(models.Model):
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name
+
+    def customized_seats(self):
+        seats = self.seats
+        return seats[0] if len(seats) == 1 else seats
+
+
+class Message(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=500)
+    message = models.TextField()
+
+    def __str__(self):
+        return self.name

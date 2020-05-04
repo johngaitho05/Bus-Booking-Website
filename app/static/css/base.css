@@ -374,13 +374,9 @@ section {
 #user_id:hover{
   text-decoration: underline !important;
 }
-.message{
-  color: #81ff63;
-  font-size: 14px;
-}
-.warning{
-  color: #ff200f;
-  font-size: 14px !important;
+.feedback-banner{
+  font-size:14px !important;
+  color:#ff200f;
 }
 
 /*---------------------------------------
@@ -580,6 +576,10 @@ section {
   width: 300px;
   height: 300px;
 }
+#contact-form{
+    text-align: left !important;
+    color: #444444;
+}
 
 #contact .form-control {
   border: 0;
@@ -600,8 +600,7 @@ section {
 #contact select {
   color: rgba(20,20,20,0.5);
 }
-
-#contact input[type='submit'] {
+#send-message-btn {
   background:#adadad;
   border-radius: 100px;
   color:#505050;

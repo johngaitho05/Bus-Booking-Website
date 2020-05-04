@@ -15,11 +15,7 @@
         <div class="row">
             {% if view == 'signup' %}
                 <div class="jumbotron" id='form_container'>
-                    {% if warning %}
-                        <p class="login-feedback warning">{{ warning }}</p>
-                    {% elif message %}
-                        <p class="login-feedback message">{{ message }}</p>
-                    {% endif%}
+                    <p class="feedback-banner" id="signup-feedback">{{ feedback }}</p>
                     <form action="{% url 'signup' %}" method="post" id="signup_form">
                         {% csrf_token %}
                         <div class='row'>
@@ -50,7 +46,7 @@
                             </div>
                         </div>
                         <div class="form-group text-center">
-                            <input type="submit" class="btn btn-info" Value="Create Account" id="registerbtn"/>
+                            <input type="button" class="btn btn-info" onclick="signUP()" Value="Create Account" id="registerbtn"/>
                         </div>
                         <div class="text-center">
                             <p id="loginlink" >Already have an account? <a href="{%  url 'login' %}">Login</a></p>

@@ -53,7 +53,7 @@
     </div>
     <h3 class="text-center">Reservation Summary</h3>
     <br/>
-    <table class="table table-bordered table-condensed table-hover">
+    <table class="table table-bordered table-condensed table-responsive">
         <thead>
         <tr>
             <th>Name</th>
@@ -61,19 +61,19 @@
             <th>Destination</th>
             <th>Travelling Date</th>
             <th>Departure Time</th>
-            <th>Seat Number</th>
+            <th>Seat(s) No.</th>
             <th>Amount</th>
 
         </tr>
         </thead>
         <tbody>
-        <tr class="active">
+        <tr>
             <td>{{ user.first_name }} {{ user.last_name }}</td>
             <td>{{booking.route.origin}}</td>
             <td>{{booking.route.destination}}</td>
             <td>{{booking.travelling_datetime.date}}</td>
             <td>{{booking.travelling_datetime.time}}</td>
-            <td>{{booking.seats}}</td>
+            <td>{{booking.customized_seats}}</td>
             <td>Ksh {{booking.amount}}</td>
         </tr>
         </tbody>
@@ -95,8 +95,7 @@
 
             </form>
             <br>
-            <h4>Payment mode: Mpesa</h4>
-            <img src="{% st %}"/>
+            <h4>Payment mode: <img src="{% static 'images/mpesa_logo.png' %}" alt="Mpesa" width="100" /></h4>
         </div>
         <div class="col-md-3">
             <h3>Amount: <span style="color:rgb(255, 87, 51);padding-left: 10px">Ksh {{ booking.amount }}</span></h3>
@@ -120,8 +119,11 @@
 <script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 <script>
-    $('#pay').click(function(){
-        document.getElementById('payment_form').submit();
+    $(document).ready(function(){
+        $('#pay').click(function(){
+            document.getElementById('payment_form').submit();
+        });
     });
+
 </script>
 </html>

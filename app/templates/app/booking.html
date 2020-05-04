@@ -18,13 +18,13 @@
             <div class="jumbotron" id="booking_container">
                 <h3 CLASS='text-center'>BOOKING FORM</h3>
                 <br/>
-                <p style="color:red;font-size:15px" id="booking-warning"></p>
-
+                <p class="feedback-banner" id="check-seats-feedback"></p>
                 <form id="booking_form">
+                    {% csrf_token %}
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="origin" class="control-label">Origin</label>
-                            <select class="form-control" name='origin' id='origin' onchange="refresh_destinations()" required>
+                            <select class="form-control" name='origin' onchange="refresh_destinations()" required>
                                 <Option value="">Select</Option>
                                 {% for origin in origins %}
                                     <Option value="{{ origin }}">{{origin}}</Option>
@@ -35,7 +35,7 @@
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="destination" class="control-label">Destination</label>
-                            <select class="form-control" name="destination" id='destination' required>
+                            <select class="form-control" name="destination" required>
                                 <Option value="">Select</Option>
                             </select>
 
@@ -51,21 +51,21 @@
                     <div class="col-md-6">
                         <div class="form-group ">
                             <label for="booking_date">Time</label>
-                            <select class="form-control" name="booking_time" id='booking_time' required>
+                            <select class="form-control" name="booking_time" required>
                             </select>
 
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="button" class='btn btn-primary' id='booking_submit' onclick="check_seats()" value="Check available seats"/>
+                        <input type="button" class='btn btn-primary' id='check-seats-button' onclick="check_seats()" value="Check available seats"/>
                     </div>
                 </form>
             </div>
         </div>
         <div id="seats-view" class="col-md-6 col-sm-12 col-xs-12 col-md-offset-3 seat-panel-wrapper" hidden>
             <div id="seat-map" class="seat-panel">
+                <p class="feedback-banner" id="checkout-feedback"></p>
                 <div class="front-indicator">Front</div>
-
             </div>
             <div class="booking-details">
 
