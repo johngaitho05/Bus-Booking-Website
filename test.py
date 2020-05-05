@@ -1,7 +1,5 @@
-# from django.utils import timezone
-#
-# print(timezone.now())
-
+for i in range(5):
+    print(i)
 
 
 

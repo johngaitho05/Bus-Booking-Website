@@ -40,9 +40,9 @@
 				},
 				click   : function() {
 
-					if (this.status() == 'available') {
+					if (this.status() === 'available') {
 						return 'selected';
-					} else if (this.status() == 'selected') {
+					} else if (this.status() === 'selected') {
 						return 'available';
 					} else {
 						return this.style();
@@ -51,7 +51,7 @@
 				},
 				focus  : function() {
 
-					if (this.status() == 'available') {
+					if (this.status() === 'available') {
 						return 'focused';
 					} else  {
 						return this.style();

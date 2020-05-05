@@ -19,16 +19,17 @@
 .seat-panel-wrapper{
     background-color: #EEEEEE !important;
     border-radius: 6px;
-    padding: 20px
+    padding: 20px;
+    margin:5px;
 }
 /*.seatCharts-row{*/
 /*    padding-left: 10%;*/
 /*}*/
 
 .seat-panel{
-	margin: auto;
-    float: left;
-    width:50%;
+	margin: auto !important;
+    /*float: left;*/
+    /*width:50%;*/
 }
 div .seatCharts-seat{
 	width: 32px;
@@ -44,8 +45,8 @@ div.seatCharts-seat.selected{
 	background: black;
 }
 .booking-details{
-    float: left;
-    width:50%;
+    /*float: left;*/
+    /*width:50%;*/
 	margin:auto;
 }
 

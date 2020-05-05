@@ -135,45 +135,48 @@
 <div id="reservationnav" class="detailedsidenav sidenav" data-backdrop=''>
     <div class="row">
         <div class="col-lg-12" style="margin:0 10px !important;">
-            {% if bookings %}
+            {% if user_bookings %}
 
                 <h3 class="text-center">Reservations</h3>
                 <br/>
-                <table class="table table-bordered table-condensed">
-                    <thead>
-                    <tr>
-                        <th>Booking Id</th>
-                        <th>Origin</th>
-                        <th>Destination</th>
-                        <th>Travelling Date</th>
-                        <th>Seat(s) No.</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for booking in bookings %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-condensed">
+                        <thead>
                         <tr>
-                            <th>{{booking.pk}}</th>
-                            <th>{{ booking.route.origin }}</th>
-                            <th>{{ booking.route.destination }}</th>
-                            <th>{{booking.travelling_datetime}}</th>
-                            <th>{{booking.customized_seats}}</th>
-                            <th>{{booking.amount}}</th>
-                            {% if booking.paid %}
-                                <th>Paid</th>
-                            {% else %}
-                                <th>Pending payment<a class="text-center" href="javascript:{document.getElementById('pay-{{ booking.id }}').submit();}" >Pay Now</a></th>
-                            {% endif %}
+                            <th>Booking Id</th>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Travelling Date</th>
+                            <th>Seat(s) No.</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+
                         </tr>
-                        <form id="pay-{{ booking.id }}" action="{% url 'summary' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="booking_id" value="{{ booking.id }}"/>
-                        </form>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% for booking in user_bookings %}
+                            <tr>
+                                <th>{{booking.pk}}</th>
+                                <th>{{ booking.route.origin }}</th>
+                                <th>{{ booking.route.destination }}</th>
+                                <th>{{booking.travelling_datetime}}</th>
+                                <th>{{booking.customized_seats}}</th>
+                                <th>{{booking.amount}}</th>
+                                {% if booking.paid %}
+                                    <th>Paid</th>
+                                {% else %}
+                                    <th>Pending payment<a class="text-center" href="javascript:{document.getElementById('pay-{{ booking.id }}').submit();}" >Pay Now</a></th>
+                                {% endif %}
+                            </tr>
+                            <form id="pay-{{ booking.id }}" action="{% url 'summary' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="booking_id" value="{{ booking.id }}"/>
+                            </form>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
                 <br/>
                 <p><span style="color:orangered">Note:</span> Reservation will be discarded if payment is not received within 30 minutes</p>
             {% else %}
@@ -349,7 +352,7 @@
 
                 <!-- CONTACT FORM HERE -->
                 <form id="contact-form">
-                    <p class="feedback-banner text-center" id="send-message-feedback"></p>
+                    <p class="feedback-banner" id="send-message-feedback"></p>
                     {% csrf_token %}
                     <div class="col-md-6 col-sm-12">
                         <label for="sender_name">Full name</label>
@@ -493,7 +496,7 @@
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
 <script src="{% static 'js/jquery.seat-charts.js' %}"></script>
-<script src="{% static 'js/angular.min.js' %}"></script>
+{#<script src="{% static 'js/angular.min.js' %}"></script>#}
 
 <script type="text/javascript">
     $(document).ready(function(){

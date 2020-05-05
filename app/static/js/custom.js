@@ -6,14 +6,14 @@ function display_seats(){
         $total = $('#total'),
         sc = $('#seat-map').seatCharts({
             map: [
-                'ff_ff',
-                'ff_ff',
-                '___ee',
-                'ee_ee',
-                'ee_ee',
-                'ee_ee',
-                'ee_ee',
-                'eeeee',
+                'ff_fff',
+                'ff_fff',
+                '___eee',
+                'ee_eee',
+                'ee_eee',
+                'ee_eee',
+                'ee_eee',
+                'eeeeee',
             ],
             seats: {
                 f: {
@@ -129,9 +129,9 @@ function recalculateTotal(sc) {
 
 
     // PARALLAX EFFECT
-    $.stellar({
-        horizontalScrolling: false,
-    });
+    // $.stellar({
+    //     horizontalScrolling: false,
+    // });
 
 
     // MAGNIFIC POPUP
@@ -317,7 +317,7 @@ function login(){
     }else if(! username){
         renderFeedback("Username field cannot be empty",'login-feedback')
     }else{
-         renderFeedback("Password field cannot be empty",'login-feedback')
+        renderFeedback("Password field cannot be empty",'login-feedback')
     }
 }
 
@@ -447,8 +447,10 @@ function check_seats(){
                     let sc = display_seats();
 
                     if (booked_seats.length !==0){
+                        let num_of_seats = document.getElementsByClassName("seatCharts-seat").length-3;
+                        console.log(num_of_seats);
                         for(let i=0;i<booked_seats.length;i++){
-                            booked_seats[i] = get_seat_id(booked_seats[i])
+                            booked_seats[i] = get_seat_id(booked_seats[i],num_of_seats)
                         }
                         sc.get(booked_seats).status('unavailable');
                     }
@@ -471,19 +473,17 @@ function check_seats(){
 
 
 function check_out(){
-    clearBanners();
     if (selected_seats.size===0 ){
         renderFeedback('You have not selected any seat','checkout-feedback')
     }else{
-        // if(booking_data){
-        // let seats = get_seats_string(selected_seats);
+        let seats = get_seats_string(Array.from(selected_seats));
         $.ajax({
             method: "POST",
             url: "",
             data: {
                 'route_id': booking_data['route_id'],
                 'datetime': booking_data['datetime'],
-                'seats': get_seats_string(Array.from(selected_seats)),
+                'seats': seats,
                 'amount': document.getElementById('total').innerHTML,
             },
             success: function (data) {
@@ -500,6 +500,8 @@ function check_out(){
                 }
             }
         });
+        console.log(selected_seats);
+        console.log([...selected_seats]);
     }
     // }
 }
@@ -524,25 +526,24 @@ function setTimeSelector(){
 
 
 // convert seat_num to seat_id
-function get_seat_id(seat_num) {
-    let num_of_seats = document.getElementsByClassName("seatCharts-seat").length-3;
+function get_seat_id(seat_label,no_of_seats) {
     let row = 1, col = 1, count = 0;
-    while (count < num_of_seats) {
+    while (count < no_of_seats) {
         let current_seat = document.getElementById(row.toString().concat("_").concat(col.toString()));
         if (current_seat) {
             count += 1;
         }
-        if (count === seat_num) {
+        if (count === seat_label) {
             break;
         }
-        if (col === 5) {
+        if (col === 6) {
             col = 1;
             row += 1;
         } else {
             col += 1;
         }
     }
-    if (count === seat_num) {
+    if (count === seat_label) {
         return row.toString().concat("_").concat(col.toString());
     }else{
         console.log("Invalid seat number");
@@ -584,12 +585,10 @@ function sendMessage(){
 
 
 function get_seats_string(set){
-    console.log(set);
     let string = "";
     for(let i=0;i<set.length;i++){
         string = string.concat((set[i]).toString().concat(','))
     }
-    console.log(string);
     return string
 }
 function  clearBanners() {
@@ -607,4 +606,11 @@ function renderFeedback(message,banner_id,response_code=1){
         banner.style.color = '#ff200f';
     }
     banner.innerHTML  = message;
+}
+
+function showDestinationConstrain(){
+    let origin = document.getElementById('booking_form').origin.value;
+    if (! origin){
+        renderFeedback('Please select origin first','check-seats-feedback')
+    }
 }

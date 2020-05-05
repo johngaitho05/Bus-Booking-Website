@@ -1,5 +1,5 @@
 div.seatCharts-container {
-	/*min-width: 700px;*/
+	min-width: 250px;
 }
 div.seatCharts-cell {
 
@@ -35,7 +35,8 @@ div.seatCharts-space {
 	background-color: white;
 }
 div.seatCharts-row {
-	height: 50px;
+	/*height: 50px;*/
+	width:fit-content;
 }
 
 div.seatCharts-row:after {
@@ -46,17 +47,25 @@ div.seatCharts-seat.selected {
 	background-color: aqua;
 }
 
-div.seatCharts-seat.focused {
+div.seatCharts-seat.economy-class.available {
+	background-color: #318063;
+}
+div.seatCharts-seat.economy-class.focused {
 	background-color: #6db131;
 }
-
-div.seatCharts-seat.available {
-	background-color: green;
+.seatCharts-seat.first-class.available{
+    background-color: #31708f;
+}
+div.seatCharts-seat.first-class.focused {
+	background-color: #1E90FF;
 }
 
 div.seatCharts-seat.unavailable {
 	background-color: red;
 	cursor: not-allowed;
+}
+.seatCharts-legendItem.seatCharts-seat:hover{
+    cursor: not-allowed;
 }
 
 ul.seatCharts-legendList {

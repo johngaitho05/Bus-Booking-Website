@@ -53,36 +53,39 @@
     </div>
     <h3 class="text-center">Reservation Summary</h3>
     <br/>
-    <table class="table table-bordered table-condensed table-responsive">
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Origin</th>
-            <th>Destination</th>
-            <th>Travelling Date</th>
-            <th>Departure Time</th>
-            <th>Seat(s) No.</th>
-            <th>Amount</th>
+    <div class="table-responsive">
+        <table class="table table-bordered table-condensed">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Travelling Date</th>
+                <th>Departure Time</th>
+                <th>Seat(s) No.</th>
+                <th>Amount</th>
 
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{ user.first_name }} {{ user.last_name }}</td>
-            <td>{{booking.route.origin}}</td>
-            <td>{{booking.route.destination}}</td>
-            <td>{{booking.travelling_datetime.date}}</td>
-            <td>{{booking.travelling_datetime.time}}</td>
-            <td>{{booking.customized_seats}}</td>
-            <td>Ksh {{booking.amount}}</td>
-        </tr>
-        </tbody>
-    </table>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{booking.route.origin}}</td>
+                <td>{{booking.route.destination}}</td>
+                <td>{{booking.travelling_datetime|date}}</td>
+                <td>{{booking.travelling_datetime|time}}</td>
+                <td>{{booking.customized_seats}}</td>
+                <td>Ksh {{booking.amount}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <br/>
     <p>Confirm Your Phone Number. Then click 'Proceed to payment' to generate payment request to your phone.
         Enter your MPESA PIN on prompt pop-up on your phone to complete the payment.</p>
     <br/>
-    <div class="row">
+    <div class="row" style="margin-bottom: 20px">
         <div class="col-md-6">
             <form action="{% url 'lipa_na_mpesa' %}" method="post" id="payment_form">
                 {% csrf_token %}
@@ -112,7 +115,7 @@
 <!-- SCRIPTS -->
 <script src="{% static 'js/jquery.js' %}"></script>
 {#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
-<script src="{% static 'js/jquery.stellar.js' %}"></script>
+{#<script src="{% static 'js/jquery.stellar.js' %}"></script>#}
 <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
 <script src="{% static 'js/smoothscroll.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>

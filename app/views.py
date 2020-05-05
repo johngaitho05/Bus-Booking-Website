@@ -159,8 +159,8 @@ def update_password(request):
 def home_view(request):
     bookings = []
     if request.user.is_authenticated:
-        bookings = Booking.objects.filter(user=request.user)
-    return render(request, 'app/index.html', {'view': 'none', 'bookings': bookings})
+        user_bookings = getUserBookings(request.user)
+    return render(request, 'app/index.html', {'view': 'none', 'user_bookings': user_bookings})
 
 
 # the booking page view
@@ -169,8 +169,9 @@ def home_view(request):
 def booking_view(request):
     today = date.today()
     future = today + timedelta(weeks=1)
-    bookings = Booking.objects.filter(user=request.user)
-    routes = getroutes()
+    routes = Route.objects.all()
+    origins = set([route.origin for route in routes])
+    user_bookings = getUserBookings(request.user)
     if request.is_ajax():
         user = request.user
         route = Route.objects.filter(id=request.POST['route_id']).first()
@@ -186,10 +187,10 @@ def booking_view(request):
             response = {'message': 'Something went wrong. Please try again'}
             return JsonResponse(response)
 
-    return render(request, 'app/booking.html', {'origins': routes['origins'],
+    return render(request, 'app/booking.html', {'origins': origins,
                                                 'min_date': str(today),
                                                 'max_date': str(future),
-                                                'bookings': bookings})
+                                                'user_bookings': user_bookings})
 
 
 # the payment page view
@@ -202,7 +203,7 @@ def summary(request):
 
 
 def payment_view(request, booking_id):
-    booking = Booking.objects.get(id=booking_id)
+    booking = get_object_or_404(Booking, id=booking_id)
     phone = request.user.profile.phone
     return render(request, 'app/payment.html',
                   {'booking': booking, 'paybill': LipanaMpesaPassword.Business_short_code, 'phone': phone})
@@ -239,17 +240,6 @@ def email_is_correct(email):
         return True
     else:
         return False
-
-
-# querying all available routes from the database
-def getroutes():
-    routes = Route.objects.all()
-    if routes:
-        origins = set([route.origin for route in routes])
-        destinations = set([route.destination for route in routes])
-        routes_dict = {'origins': origins, 'destinations': destinations}
-        return routes_dict
-    return {"origins": [], 'destinations': []}
 
 
 @csrf_exempt
@@ -317,9 +307,22 @@ def save_message(request):
 def make_seats_list(string):
     seats = string.split(',')
     seats.pop()
-    return sorted([int(seat_id) for seat_id in seats])
+    return sorted(list(map(int, seats)))
 
 
 def delete_unpaid():
     filter_datetime = timezone.now() - timezone.timedelta(minutes=30)
     Booking.objects.filter(booking_datetime__lte=filter_datetime, paid=False).delete()
+
+
+def getUserBookings(user):
+    bookings = Booking.objects.filter(user=user)
+    if bookings:
+        return [booking for booking in bookings if isValidBooking(booking)]
+    return
+
+
+def isValidBooking(booking):
+    if (not booking.route.active and not booking.paid) or booking.travelling_datetime < timezone.now():
+        return False
+    return True
