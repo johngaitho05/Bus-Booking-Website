@@ -1,0 +1,47 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 09-May-2020, 16:01:19
+    Author     : John YK
+*/
+
+body{
+    background-color:#e2e2e2;
+}
+.row{
+    margin:0;
+    padding:0;
+}
+.payment-div{
+    border-radius: 2px;
+    background: white;
+    padding: 50px;
+    max-width: 400px;
+    text-align: center;
+    margin: auto;
+    margin-top: 10%;
+}
+#mpesa-logo{
+    display: inline;
+}
+.payment-div h3{
+    color:#d138f7;
+    font-weight: 600;
+    margin:0;
+    padding:0;
+}
+
+.payment-div p {
+    font-size: 1.7rem;
+    padding-bottom: .5rem;
+    font-weight: 600;
+    color: #000;
+}
+.payment-div p span{
+    color:#d138f7;
+    padding-left: 5px;
+    
+}

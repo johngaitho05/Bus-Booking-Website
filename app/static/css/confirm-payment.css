@@ -1,0 +1,28 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 09-May-2020, 17:45:19
+    Author     : John YK
+*/
+body{
+    background-color:#e2e2e2;
+}
+.row{
+    margin:0;
+    padding:0;
+}
+.payment-div{
+    border-radius: 2px;
+    background: white;
+    padding: 50px;
+    max-width: 400px;
+    text-align: center;
+    margin: 10% auto auto;
+}
+
+h2{
+    color:#00F260;
+}
