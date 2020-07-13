@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import requests
@@ -83,18 +84,21 @@ def validation(request):
 def confirmation(request):
     mpesa_body = request.body.decode('utf-8')
     mpesa_payment = json.loads(mpesa_body)
-    payment = MpesaPayment(
-        first_name=mpesa_payment['FirstName'],
-        last_name=mpesa_payment['LastName'],
-        middle_name=mpesa_payment['MiddleName'],
-        description=mpesa_payment['TransID'],
-        phone_number=mpesa_payment['MSISDN'],
-        amount=mpesa_payment['TransAmount'],
-        reference=mpesa_payment['BillRefNumber'],
-        organization_balance=mpesa_payment['OrgAccountBalance'],
-        type=mpesa_payment['TransactionType'],
-    )
-    payment.save()
+    try:
+        payment = MpesaPayment(
+            first_name=mpesa_payment['FirstName'],
+            last_name=mpesa_payment['LastName'],
+            middle_name=mpesa_payment['MiddleName'],
+            description=mpesa_payment['TransID'],
+            phone_number=mpesa_payment['MSISDN'],
+            amount=mpesa_payment['TransAmount'],
+            reference=mpesa_payment['BillRefNumber'],
+            organization_balance=mpesa_payment['OrgAccountBalance'],
+            type=mpesa_payment['TransactionType'],
+        )
+        payment.save()
+    except IntegrityError:
+        print("integrity error")
     acc = mpesa_payment['BillRefNumber']
     booking = get_object_or_404(Booking, id=accountNumberToPk(acc))
     booking.paid = True
