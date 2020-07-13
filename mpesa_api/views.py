@@ -23,8 +23,8 @@ def register_urls(request):
     headers = {"Authorization": "Bearer %s" % access_token}
     options = {"ShortCode": "601481",
                "ResponseType": "Completed",
-               "ConfirmationURL": "https://bookweb-app.herokuapp.com/c2b/confirmation",
-               "ValidationURL": "https://bookweb-app.herokuapp.com/validation"}
+               "ConfirmationURL": "https://bookweb-app.herokuapp.com/api/c2b/confirmation",
+               "ValidationURL": "https://bookweb-app.herokuapp.com/api/c2b/validation"}
     response = requests.post(api_url, json=options, headers=headers)
     return HttpResponse(response.text)
 
@@ -41,23 +41,24 @@ def lipa_na_mpesa_online(request):
             api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
             headers = {"Authorization": "Bearer %s" % access_token}
             request = {
-                "BusinessShortCode": paybill,
+                "BusinessShortCode": 174379,
                 "Password": LipanaMpesaPassword.decode_password,
                 "Timestamp": LipanaMpesaPassword.lipa_time,
                 "TransactionType": "CustomerPayBillOnline",
-                "Amount": int(amount),
-                "PartyA": int(mpesa_number),  # replace with your phone number to get stk push
-                "PartyB": paybill,
-                "PhoneNumber": int(mpesa_number),  # replace with your phone number to get stk push
-                "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
-                "AccountReference": booking_id,
-                "TransactionDesc": "Testing stk push"
+                "Amount": 1,
+                "PartyA": 254708374149,
+                "PartyB": 174379,
+                "PhoneNumber": int(mpesa_number),
+                "CallBackURL": "https://bookweb-app.herokuapp.com/api/c2b/callback",
+                "AccountReference": "Ref01",
+                "TransactionDesc": "Testing STK Push"
             }
             response = requests.post(api_url, json=request, headers=headers)
             print(response.json())
             return redirect('payment', booking_id=booking_id)
         else:
-            return render(request, 'app/summary.html', {'alert_message': 'invalid Phone number'})
+            booking = get_object_or_404(Booking, id=booking_id)
+            return render(request, 'app/summary.html', {'booking': booking, 'alert_message': 'invalid Phone number', })
 
     return redirect('booking')
 

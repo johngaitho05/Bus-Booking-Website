@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '@7xnuha^qc75+9m!b+k66vb2d188pwbq6yfp*rtf^3ca54mx=q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['a944b093.ngrok.io', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['bookweb-app.herokuapp.com', 'www.bookweb-app.herokuapp.com', '127.0.0.1', 'localhost']
 
 # Application definition
 

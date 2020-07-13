@@ -201,9 +201,13 @@ section {
   margin-left: 0;
   padding: 0;
 }
+#logo{
+  margin-bottom:10px;
+  display: block;
+  padding-top: 0 !important;
+}
 #logo img{
   height: 60px;
-
 }
 
 
