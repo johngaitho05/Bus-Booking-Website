@@ -23,8 +23,8 @@ def register_urls(request):
     headers = {"Authorization": "Bearer %s" % access_token}
     options = {"ShortCode": "601481",
                "ResponseType": "Completed",
-               "ConfirmationURL": "https://bookweb-app.herokuapp.com/api/c2b/confirmation",
-               "ValidationURL": "https://bookweb-app.herokuapp.com/api/c2b/validation"}
+               "ConfirmationURL": "https://bookweb-app.herokuapp.com/api/c2b/confirmation/",
+               "ValidationURL": "https://bookweb-app.herokuapp.com/api/c2b/validation/"}
     response = requests.post(api_url, json=options, headers=headers)
     return HttpResponse(response.text)
 
@@ -49,7 +49,7 @@ def lipa_na_mpesa_online(request):
                 "PartyA": 254708374149,
                 "PartyB": 174379,
                 "PhoneNumber": int(mpesa_number),
-                "CallBackURL": "https://bookweb-app.herokuapp.com/api/c2b/callback",
+                "CallBackURL": "https://bookweb-app.herokuapp.com/api/c2b/callback/",
                 "AccountReference": "Ref01",
                 "TransactionDesc": "Testing STK Push"
             }
