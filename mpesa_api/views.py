@@ -66,8 +66,9 @@ def lipa_na_mpesa_online(request):
 
 @csrf_exempt
 def call_back(request):
-    print(request.body.decode('utf-8'))
-    return JsonResponse(request.body.decode('utf-8'))
+    json_data = request.body.decode('utf-8')
+    loaded_data = json.loads(json_data)
+    return JsonResponse(loaded_data)
 
 
 @csrf_exempt
