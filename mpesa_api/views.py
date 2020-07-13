@@ -9,6 +9,7 @@ from .mpesa_credentials import MpesaAccessToken, LipanaMpesaPassword
 from django.views.decorators.csrf import csrf_exempt
 from .models import MpesaPayment
 from app.views import loginRequired
+from projectdir.utils import accountNumberToPk
 
 
 def getAccessToken(request):
@@ -56,7 +57,7 @@ def lipa_na_mpesa_online(request):
             print(response.json())
             return redirect('payment', booking_id=booking_id)
         else:
-            return render(request, 'app/index.html', {'alert_message': 'invalid Phone number'})
+            return render(request, 'app/summary.html', {'alert_message': 'invalid Phone number'})
 
     return redirect('booking')
 
@@ -94,34 +95,36 @@ def confirmation(request):
     )
     payment.save()
     acc = mpesa_payment['BillRefNumber']
-    booking = Booking.objects.get(id=int(formatted_account_number(acc)))
+    booking = get_object_or_404(Booking, id=accountNumberToPk(acc))
     booking.paid = True
     booking.save()
 
 
+@csrf_exempt
 @loginRequired
 def simulate_payment(request):
-    if request.method == 'POST':
-        amount = int(request.POST['amount'])
-        raw_acc = int(request.POST['account_number'])
+    if request.is_ajax():
+        booking = get_object_or_404(Booking, id=request.POST['booking_id'])
         access_token = MpesaAccessToken.validated_mpesa_access_token
         api_url = "https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate"
         headers = {"Authorization": "Bearer %s" % access_token}
         request = {"ShortCode": "601481",
                    "CommandID": "CustomerPayBillOnline",
-                   "Amount": amount,
+                   "Amount": booking.amount,
                    "Msisdn": 254708374149,
-                   "BillRefNumber": formatted_account_number(raw_acc)}
+                   "BillRefNumber": booking.account_number()
+                   }
 
         requests.post(api_url, json=request, headers=headers)
-        # countdown = 10
+        # countdown = 7
         # while countdown > 0:
         #     time.sleep(1)
         #     countdown -= 1
-        booking = Booking.objects.get(id=raw_acc)
         if booking.paid is True:
-            return HttpResponse("payment received")
-        return HttpResponse("payment has not been received!")
+            return JsonResponse({'message': 'Payment was successful', 'code': 0})
+        return JsonResponse({'message': 'We could not verify your payment', 'code': 1})
+
+    raise Http404('Page not found')
 
 
 @csrf_exempt
@@ -135,20 +138,3 @@ def result_view(request):
 def timeout_view(request):
     mpesa_body = request.body.decode('utf-8')
     return HttpResponse(mpesa_body)
-
-
-def formatted_account_number(num):
-    if type(num) == int:
-        if num > 10:
-            return 'B00' + str(num)
-        elif num < 100:
-            return 'B0' + str(num)
-        else:
-            return 'B' + str(num)
-
-    elif type(num) == str:
-        for i in range(len(num)):
-            if num[i] != 'B' and num[i] != '0':
-                return num[i:]
-
-    return '-1'

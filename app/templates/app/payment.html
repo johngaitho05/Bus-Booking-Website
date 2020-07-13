@@ -1,53 +1,74 @@
 <!DOCTYPE html>
-<html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html lang="en-us">
+{% load static %}
 <head>
-    {% load staticfiles %}
+    <title>TODO supply a title</title>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
-    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href=" {% static 'css/bootstrap.css' %} " />
-    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Rokkitt|Lobster|Bad+Script&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/templatemo-style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+{#    <link rel="stylesheet" href=" {% static 'css/bootstrap.css'%} "/>#}
+    <link rel="stylesheet" href="{% static 'css/payment.css'  %}" />
 </head>
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12">
-           <div class="navbar custom-navbar navbar-fixed-top">
-                    <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
-                </div>
+<div id="alert-container"></div>
+<div class="row">
+    {#    <div class="col-xs-12 col-sm-12 col-md-12">#}
+    {##}
+    {#    </div>#}
+    <div class="col-xs-12 col-sm-12 col-md-6 offset-md-3">
+        <div class='payment-div'>
+            <h3>Payment Information</h3>
+            <img id='mpesa-logo' src="{% static 'images/mpesa_logo.png' %}"
+                 class='img-responsive' width='150' height='100'  alt="Mode: Mpesa" />
+            <p id="payment-description">Use the details below to send your payment</p>
+            <p>Paybill No:<span>{{ payBill }}</span></p>
+            <p>Account No:<span>{{ booking.account_number }}</span></p>
+            <p>Amount:<span>Ksh.{{ booking.amount }}</span></p>
+            <button class="btn btn-info" style='width:70%' onclick="confirmPayment({{ booking.id }})">
+                Already paid
+            </button>
         </div>
-        </div>
-
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3 text-center" style="margin-top:100px"></div>
-        <h4 class="payment-info">Paybill Number: <span>{{paybill}}</span></h4>
-        <h4 class="payment-info">Account Number: <span>{{booking.id}}</span></h4>
-        <h4 class="payment-info">Amount: <span>{{booking.amount}}</span></h4>
-        <br/>
-        <form method="post" action="{% url 'simulate_payment'%}">
-            {% csrf_token %}
-            <input type="hidden" name="account_number" value="{{ booking.id }}"/>
-            <input type="hidden" name="paybill" value="{{ paybill }}"/>
-            <input type="hidden" name="phone" value="{{ phone }}"/>
-            <input type="hidden" name="amount" value="{{ booking.amount }}"/>
-            <input type="submit" class="btn btn-info" value="I have Paid"/>
-        </form>
     </div>
 </div>
-</body>
-<!-- SCRIPTS -->
-<script src="{% static 'js/jquery.js' %}"></script>
-{#<script src="{% static 'js/bootstrap.min.js' %}"></script>#}
-<script src="{% static 'js/jquery.stellar.js' %}"></script>
-<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
-<script src="{% static 'js/smoothscroll.js' %}"></script>
-<script src="{% static 'js/custom.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/jquery-3.3.1.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+<div class="modal loader"></div>
 
+<script src="//code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/confirm-payment.js' %}"></script>
+<script type="text/javascript">
+    $body = $("body");
+
+    $(document).on({
+        ajaxStart: function() { $body.addClass("loading");    },
+        ajaxStop: function() { $body.removeClass("loading"); }
+    });
+</script>
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

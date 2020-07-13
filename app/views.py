@@ -13,7 +13,7 @@ from .models import Profile, Route, Booking, Message
 from mpesa_api.mpesa_credentials import LipanaMpesaPassword
 from django.contrib.auth import authenticate, logout, login
 import re
-from django.contrib import messages
+from projectdir.utils import accountNumberToPk
 
 
 def loginRequired(func):
@@ -39,8 +39,9 @@ def check_authentication(func):
 def login_view(request):
     if request.is_ajax():
         username = request.POST['username']
+        print(username)
         password = request.POST['password']
-        if username and password:
+        if email_is_correct(username) and password:
             user = authenticate(username=username, password=password)
             if user is not None:
                 if user.is_active:
@@ -115,7 +116,7 @@ def update_user(request):
         if first_name and last_name and number and email:
             if number_is_correct(number) and email_is_correct(email):
                 user = User.objects.get(username=request.user.username)
-                updated_info = {'first_name': first_name, 'last_name': last_name, 'email': email}
+                updated_info = {'first_name': first_name, 'last_name': last_name, 'email': email, 'username': email}
                 for (key, value) in updated_info.items():
                     setattr(user, key, value)
                 user.profile.phone = number
@@ -157,7 +158,7 @@ def update_password(request):
 
 # the homepage view
 def home_view(request):
-    bookings = []
+    user_bookings = []
     if request.user.is_authenticated:
         user_bookings = getUserBookings(request.user)
     return render(request, 'app/index.html', {'view': 'none', 'user_bookings': user_bookings})
@@ -204,42 +205,8 @@ def summary(request):
 
 def payment_view(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    phone = request.user.profile.phone
     return render(request, 'app/payment.html',
-                  {'booking': booking, 'paybill': LipanaMpesaPassword.Business_short_code, 'phone': phone})
-
-
-# function to check if the entered phone number is correct
-def number_is_correct(number):
-    try:
-        print(int(number))
-        if number[0] == '0' and len(number) == 10 or number[0] == '7' and \
-                len(number) == 9 or number[0:3] == '254' and len(number) == 12:
-            return True
-        else:
-            return False
-    except ValueError:
-        return False
-
-
-# formatting the phone number before saving
-def format_number(number):
-    if number[0] == '0':
-        formatted_number = '254' + number[1:]
-    elif number[0] == '7':
-        formatted_number = '254' + number
-    else:
-        formatted_number = number
-    return formatted_number
-
-
-# checking whether the entered email is correct using regex
-def email_is_correct(email):
-    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
-    if re.search(regex, email):
-        return True
-    else:
-        return False
+                  {'booking': booking, 'payBill': LipanaMpesaPassword.Business_short_code})
 
 
 @csrf_exempt
@@ -326,3 +293,36 @@ def isValidBooking(booking):
     if (not booking.route.active and not booking.paid) or booking.travelling_datetime < timezone.now():
         return False
     return True
+
+
+# function to check if the entered phone number is correct
+def number_is_correct(number):
+    try:
+        print(int(number))
+        if number[0] == '0' and len(number) == 10 or number[0] == '7' and \
+                len(number) == 9 or number[0:3] == '254' and len(number) == 12:
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+
+
+# formatting the phone number before saving
+def format_number(number):
+    if number[0] == '0':
+        formatted_number = '254' + number[1:]
+    elif number[0] == '7':
+        formatted_number = '254' + number
+    else:
+        formatted_number = number
+    return formatted_number
+
+
+# checking whether the entered email is correct using regex
+def email_is_correct(email):
+    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    if re.search(regex, email):
+        return True
+    else:
+        return False

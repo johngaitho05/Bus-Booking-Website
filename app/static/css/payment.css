@@ -7,9 +7,17 @@ and open the template in the editor.
     Created on : 09-May-2020, 16:01:19
     Author     : John YK
 */
+html {
+    height: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    background: linear-gradient( 109.6deg,  rgba(123,90,224,1) 11.2%, rgba(164,46,253,1) 32.6%, rgba(213,56,234,1) 62.7% );
+}
 
 body{
-    background-color:#e2e2e2;
+    background: linear-gradient( 109.6deg,  rgba(123,90,224,1) 11.2%, rgba(164,46,253,1) 32.6%, rgba(213,56,234,1) 62.7% ) fixed;
 }
 .row{
     margin:0;
@@ -21,21 +29,26 @@ body{
     padding: 50px;
     max-width: 400px;
     text-align: center;
-    margin: auto;
-    margin-top: 10%;
+    margin: 10% auto auto;
 }
 #mpesa-logo{
     display: inline;
+    color: #2FA427;
+    font-size: 30px;
 }
 .payment-div h3{
-    color:#d138f7;
+    color:#41B1C6;
     font-weight: 600;
     margin:0;
     padding:0;
 }
+#payment-description{
+   font-size: 15px;
+    color:#41B1C6;
+}
 
 .payment-div p {
-    font-size: 1.7rem;
+    font-size: 15px;
     padding-bottom: .5rem;
     font-weight: 600;
     color: #000;
@@ -45,3 +58,37 @@ body{
     padding-left: 5px;
     
 }
+
+
+/*PLEASE WAIT ANIMATION*/
+/* Start by setting display:none to make this hidden.
+   Then we position it in relation to the viewport window
+   with position:fixed. Width, height, top and left speak
+   for themselves. Background we set to 80% white with
+   our animation centered, and no-repeating */
+.loader {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 )
+                url('../images/ajax-loader.gif')
+                50% 50%
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading .loader {
+    overflow: hidden;
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .loader {
+    display: block;
+}
+

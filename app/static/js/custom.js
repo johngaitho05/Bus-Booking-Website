@@ -162,11 +162,15 @@ function recalculateTotal(sc) {
 })(jQuery);
 
 function openDetailedSideNav(x){
-    let navs = document.getElementsByClassName('detailedsidenav');
-    for(let i=0;i<navs.length;i++){
-        navs[i].style.width = "0";
-    }
-    navs[x].style.width = "60%";
+    let navs = $('.detailedsidenav');
+    navs.each(function(index){
+        console.log(index);
+        if(index===x){
+            $(this).toggleClass('expanded',true)
+        }else{
+            $(this).toggleClass('expanded',false)
+        }
+    });
     toggleCarets(x);
 }
 
@@ -185,20 +189,18 @@ function toggleCarets(x){
 
 
 // opening the primary sidenav
-function openPrimarySideNav() {
-    document.getElementById("mySidenav").style.width = "20%";
-}
-function closePrimarySideNav() {
+function togglePrimarySideNav() {
+    $('#primarySideNav').toggleClass('expanded');
     closeAll();
-    document.getElementById("mySidenav").style.width = "0";
 }
+
 
 /* Set the width of the side navigation to 0 */
 function closeAll() {
-    let navs = document.getElementsByClassName('detailedsidenav');
-    for (let i=0;i<navs.length;i++){
-        navs[i].style.width = '0';
-    }
+    let navs = $('.detailedsidenav');
+    navs.each(function(){
+        $(this).toggleClass('expanded', false)
+    });
 }
 
 
@@ -291,6 +293,7 @@ function login(){
     let password = form.password.value;
     let where_to = form.where_to.value;
     if (username && password){
+        // $('#loginModal').modal('hide');
         $.ajax({
             method: 'POST',
             url: '',
@@ -310,6 +313,7 @@ function login(){
                         window.location = '/'
                     }
                 }else{
+                    // $('#loginModal').modal('show');
                     renderFeedback(message,'login-feedback')
                 }
             }
@@ -614,3 +618,16 @@ function showDestinationConstrain(){
         renderFeedback('Please select origin first','check-seats-feedback')
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

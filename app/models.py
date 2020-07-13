@@ -38,6 +38,14 @@ class Booking(models.Model):
         seats = self.seats
         return seats[0] if len(seats) == 1 else seats
 
+    def account_number(self):
+        if self.pk < 10:
+            return 'B00' + str(self.pk)
+        elif self.pk < 100:
+            return 'B0' + str(self.pk)
+        else:
+            return 'B' + str(self.pk)
+
 
 class Message(models.Model):
     name = models.CharField(max_length=100)

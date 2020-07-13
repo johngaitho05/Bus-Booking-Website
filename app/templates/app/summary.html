@@ -36,7 +36,9 @@
                     </button>
 
                     <!-- lOGO TEXT HERE -->
-                    <a href="{% url 'home' %}" class="navbar-brand" id="logo">The Guardian</a>
+                    <a href="{% url 'home' %}" class="navbar-brand" id="logo">
+                        <img src="{% static 'images/guargianLogo.png' %}" alt="The Guardian Coach"/>
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,11 +93,10 @@
                 {% csrf_token %}
                 <div class="input-group">
                     <div class="input-group-addon">Mpesa Number:</div>
-                    <input type="text" id='mpesa_number' name='mpesa_number' value="{{user.profile.phone}}" class="form-control" style="max-width: 200px"/>
+                    <input type="text" id='mlpesa_number' name='mpesa_number' value="{{user.profile.phone}}" class="form-control" style="max-width: 200px"/>
                 </div>
                 <input type="hidden" name='amount' value="{{ booking.amount }}"/>
                 <input type="hidden"  name="booking_id" value='{{ booking.id }}'/>
-
             </form>
             <br>
             <h4>Payment mode: <img src="{% static 'images/mpesa_logo.png' %}" alt="Mpesa" width="100" /></h4>
