@@ -1,1 +1,1 @@
-web: gunicorn projectdir.wsgi
+web: gunicorn bookweb-app.wsgi
