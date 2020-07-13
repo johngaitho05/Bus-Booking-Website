@@ -68,7 +68,7 @@ def lipa_na_mpesa_online(request):
 def call_back(request):
     json_data = request.body.decode('utf-8')
     loaded_data = json.loads(json_data)
-    print(loaded_data)
+    print(loaded_data.body.stkCallback)
     return JsonResponse(loaded_data)
 
 
