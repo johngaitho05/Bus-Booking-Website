@@ -23,8 +23,8 @@ def register_urls(request):
     headers = {"Authorization": "Bearer %s" % access_token}
     options = {"ShortCode": "601481",
                "ResponseType": "Completed",
-               "ConfirmationURL": "https://a944b093.ngrok.io/c2b/confirmation",
-               "ValidationURL": "https://a944b093.ngrok.io/c2b/validation"}
+               "ConfirmationURL": "https://bookweb-app.herokuapp.com/c2b/confirmation",
+               "ValidationURL": "https://bookweb-app.herokuapp.com/validation"}
     response = requests.post(api_url, json=options, headers=headers)
     return HttpResponse(response.text)
 
